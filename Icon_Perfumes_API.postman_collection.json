@@ -1,0 +1,1844 @@
+{
+    "info": {
+        "_postman_id": "icon-perfumes-api-collection",
+        "name": "Icon Perfumes API",
+        "description": "Complete API collection for Icon Perfumes Backend (Django REST Framework). Base URL: {{base_url}}/api/",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "item": [
+        {
+            "name": "Auth & Accounts",
+            "description": "User authentication, registration, OTP verification, password management",
+            "item": [
+                {
+                    "name": "Signup",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone_number\": \"9876543210\",\n    \"password\": \"securePassword123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/signup/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "signup",
+                                ""
+                            ]
+                        },
+                        "description": "Register a new user. Sends OTP to email for verification. Returns masked_email and email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"phone_number\": \"9876543210\",\n    \"password\": \"securePassword123\",\n    \"cart_data\": [],\n    \"wishlist_data\": []\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/login/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "login",
+                                ""
+                            ]
+                        },
+                        "description": "Login with phone_number (or email) and password. Optionally sync cart_data and wishlist_data from localStorage. Sets 'token' cookie on success."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Email OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john@example.com\",\n    \"otp\": \"123456\",\n    \"data\": {\n        \"cart_data\": [],\n        \"wishlist_data\": []\n    }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/verify-email/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "verify-email",
+                                ""
+                            ]
+                        },
+                        "description": "Verify user email with OTP received after signup. Activates user account and sets token cookie."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Send OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john@example.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/send-otp/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "send-otp",
+                                ""
+                            ]
+                        },
+                        "description": "Resend OTP to user's email. Max 5 OTPs per day."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Forgot Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john@example.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/forgot-password/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "forgot-password",
+                                ""
+                            ]
+                        },
+                        "description": "Send a password reset link to the user's email."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"new_password\": \"newSecurePassword456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/reset-password/:token/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "reset-password",
+                                ":token",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "token",
+                                    "value": "abc123",
+                                    "description": "Reset password token received via email"
+                                }
+                            ]
+                        },
+                        "description": "Reset password using the token sent to email via forgot-password endpoint."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Change Password",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"old_password\": \"securePassword123\",\n    \"new_password\": \"newSecurePassword456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/change-password/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "change-password",
+                                ""
+                            ]
+                        },
+                        "description": "Change password for authenticated user. Requires old_password and new_password."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/logout/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "logout",
+                                ""
+                            ]
+                        },
+                        "description": "Logout current user. Deletes 'token' cookie."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "User Profile",
+            "description": "User profile CRUD and OTP verification for profile updates",
+            "item": [
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/profile/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile",
+                                ""
+                            ]
+                        },
+                        "description": "Get authenticated user's profile (phone_number, email, username, name)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"John Updated\",\n    \"username\": \"john_updated\",\n    \"email\": \"john_new@example.com\",\n    \"phone_number\": \"9876543211\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/profile/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile",
+                                ""
+                            ]
+                        },
+                        "description": "Update user profile. If email or phone_number changes, an OTP is sent for verification."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/profile/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile",
+                                ""
+                            ]
+                        },
+                        "description": "Delete authenticated user's account permanently."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Profile Update OTP",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"otp\": \"123456\",\n    \"data\": {\n        \"name\": \"John Updated\",\n        \"username\": \"john_updated\",\n        \"email\": \"john_new@example.com\",\n        \"phone_number\": \"9876543211\"\n    }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/verify-profile-otp/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "verify-profile-otp",
+                                ""
+                            ]
+                        },
+                        "description": "Verify OTP sent during profile update (when email/phone changed). On success, profile is updated."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Current User",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/getUser/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "getUser",
+                                ""
+                            ]
+                        },
+                        "description": "Get current authenticated user info (id, username, email, phone_number, is_staff, is_superuser)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get User By ID",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/getUserById/?id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "getUserById",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "User ID to fetch"
+                                }
+                            ]
+                        },
+                        "description": "Get user details by ID. Requires authentication."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Users",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/getAllUsers/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "getAllUsers",
+                                ""
+                            ]
+                        },
+                        "description": "Get all users. Requires staff/admin authentication."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Addresses",
+            "description": "User address management (max 5 addresses per user)",
+            "item": [
+                {
+                    "name": "Get All Addresses",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/getAllAddresses/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "getAllAddresses",
+                                ""
+                            ]
+                        },
+                        "description": "Get all addresses for the authenticated user along with user info."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Address",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/addresses/?address_id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "addresses",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "address_id",
+                                    "value": "1",
+                                    "description": "Address ID to fetch"
+                                }
+                            ]
+                        },
+                        "description": "Get a single address by address_id query parameter."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Add Address",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"address\": \"123 Main Street, Apt 4B\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"country\": \"India\",\n    \"pincode\": \"400001\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/addresses/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "addresses",
+                                ""
+                            ]
+                        },
+                        "description": "Add a new address. Max 5 addresses per user. Requires address, city, state, pincode."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Address",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"address\": \"456 New Street\",\n    \"city\": \"Delhi\",\n    \"state\": \"Delhi\",\n    \"country\": \"India\",\n    \"pincode\": \"110001\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/addresses/?address_id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "addresses",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "address_id",
+                                    "value": "1",
+                                    "description": "Address ID to update"
+                                }
+                            ]
+                        },
+                        "description": "Update an existing address by address_id. All fields are optional (partial update)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Address",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/addresses/?address_id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "addresses",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "address_id",
+                                    "value": "1",
+                                    "description": "Address ID to delete"
+                                }
+                            ]
+                        },
+                        "description": "Delete an address by address_id. Only the owner can delete their address."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "description": "Product listing, detail, categories, and banners",
+            "item": [
+                {
+                    "name": "Get All Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/products/?page=1&limit=12&query=&new_arrival=&best_seller=&exclusive=&recommended=&is_combo=&category=&sub-category=&sort_by=&isPage=true&filters={}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "products",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Current page number (default: 1)"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "12",
+                                    "description": "Products per page (default: 12)"
+                                },
+                                {
+                                    "key": "query",
+                                    "value": "",
+                                    "description": "Search query (searches in title, description, keywords)"
+                                },
+                                {
+                                    "key": "new_arrival",
+                                    "value": "",
+                                    "description": "Filter new arrivals (true/false)"
+                                },
+                                {
+                                    "key": "best_seller",
+                                    "value": "",
+                                    "description": "Filter best sellers (true/false)"
+                                },
+                                {
+                                    "key": "exclusive",
+                                    "value": "",
+                                    "description": "Filter exclusive products (true/false)"
+                                },
+                                {
+                                    "key": "recommended",
+                                    "value": "",
+                                    "description": "Filter recommended products (true/false)"
+                                },
+                                {
+                                    "key": "is_combo",
+                                    "value": "",
+                                    "description": "Filter combo products (true/false)"
+                                },
+                                {
+                                    "key": "category",
+                                    "value": "",
+                                    "description": "Parent category name (e.g. 'attars')"
+                                },
+                                {
+                                    "key": "sub-category",
+                                    "value": "",
+                                    "description": "Sub-category name (e.g. 'floral')"
+                                },
+                                {
+                                    "key": "sort_by",
+                                    "value": "",
+                                    "description": "Sort: price_low_to_high, price_high_to_low, name_a_to_z, name_z_to_a, date_old_to_new, date_new_to_old"
+                                },
+                                {
+                                    "key": "isPage",
+                                    "value": "true",
+                                    "description": "Enable pagination (true/false). If false, returns all products."
+                                },
+                                {
+                                    "key": "filters",
+                                    "value": "{}",
+                                    "description": "JSON filters e.g. {\"price\":{\"min\":100,\"max\":5000}}"
+                                }
+                            ]
+                        },
+                        "description": "Get all product variants with pagination, search, filters, sorting, and category filtering. No auth required."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Product",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/product/:slug/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "product",
+                                ":slug",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "slug",
+                                    "value": "product-name",
+                                    "description": "Product slug"
+                                }
+                            ]
+                        },
+                        "description": "Get single product details by slug. Returns variants, reviews, and related products based on shared notes."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/categories/?category=&sub-category=&product=",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "categories",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "category",
+                                    "value": "",
+                                    "description": "Parent category name (optional)"
+                                },
+                                {
+                                    "key": "sub-category",
+                                    "value": "",
+                                    "description": "Sub-category name (optional)"
+                                },
+                                {
+                                    "key": "product",
+                                    "value": "",
+                                    "description": "Product slug to validate category (optional)"
+                                }
+                            ]
+                        },
+                        "description": "Get product categories. Returns all categories when no params, or filters by parent/sub-category. Supports product slug validation."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Banners",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/banners/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "banners",
+                                ""
+                            ]
+                        },
+                        "description": "Get all active banners (hero sections). Returns section, image, mobile_image, is_active."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Cart",
+            "description": "Shopping cart operations (requires authentication)",
+            "item": [
+                {
+                    "name": "Get Cart",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/cart/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "cart",
+                                ""
+                            ]
+                        },
+                        "description": "Get all items in the authenticated user's cart."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Add to Cart",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/add-to-cart/:id/?quantity=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "add-to-cart",
+                                ":id",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "quantity",
+                                    "value": "1",
+                                    "description": "Quantity to add (default: 1)"
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ProductVariant ID"
+                                }
+                            ]
+                        },
+                        "description": "Add a product variant to cart. Pass variant ID in URL. Optional quantity query param."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Remove from Cart",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/remove-from-cart/:id/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "remove-from-cart",
+                                ":id",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ProductVariant ID to remove"
+                                }
+                            ]
+                        },
+                        "description": "Remove a product variant from the cart."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Plus Cart (Increase Qty)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/plus-cart/:id/?quantity=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "plus-cart",
+                                ":id",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "quantity",
+                                    "value": "1",
+                                    "description": "Quantity to increase by (default: 1)"
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ProductVariant ID"
+                                }
+                            ]
+                        },
+                        "description": "Increase quantity of a product variant in cart. Limited by stock availability."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Minus Cart (Decrease Qty)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/minus-cart/:id/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "minus-cart",
+                                ":id",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ProductVariant ID"
+                                }
+                            ]
+                        },
+                        "description": "Decrease quantity of a product variant in cart. If quantity becomes 0, asks for removal confirmation."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Wishlist",
+            "description": "Wishlist operations (requires authentication)",
+            "item": [
+                {
+                    "name": "Get All Wishlists",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/getAllWishlists/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "getAllWishlists",
+                                ""
+                            ]
+                        },
+                        "description": "Get all wishlist items for the authenticated user."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Add to Wishlist",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/add-wishlist/:id/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "add-wishlist",
+                                ":id",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ProductVariant ID to add to wishlist"
+                                }
+                            ]
+                        },
+                        "description": "Add a product variant to the wishlist. Uses get_or_create to prevent duplicates."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Remove from Wishlist",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/remove-wishlist/:id/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "remove-wishlist",
+                                ":id",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "ProductVariant ID to remove from wishlist"
+                                }
+                            ]
+                        },
+                        "description": "Remove a product variant from the wishlist."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Reviews",
+            "description": "Product review operations",
+            "item": [
+                {
+                    "name": "Get Product Reviews",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/get-reviews/:product_slug/?page=1&limit=2",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "get-reviews",
+                                ":product_slug",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1",
+                                    "description": "Page number"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "2",
+                                    "description": "Reviews per page"
+                                }
+                            ],
+                            "variable": [
+                                {
+                                    "key": "product_slug",
+                                    "value": "product-name",
+                                    "description": "Product slug"
+                                }
+                            ]
+                        },
+                        "description": "Get reviews for a product by slug. Paginated. Returns average rating, rating distribution (1-5), and reviews. No auth required."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Post Review",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"rating\": 5,\n    \"comment\": \"Amazing fragrance! Lasts all day.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/review/:id/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "review",
+                                ":id",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Product ID (not variant ID)"
+                                }
+                            ]
+                        },
+                        "description": "Post a review for a product. Max 3 reviews per user per product. Rating: 1-5, comment is optional."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Checkout & Payments",
+            "description": "Checkout total calculation, order creation, and payment verification",
+            "item": [
+                {
+                    "name": "Calculate Checkout Total",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"source\": \"cart\",\n    \"promo_code\": \"\",\n    \"pincode\": \"400001\",\n    \"paymentMethod\": \"ONLINE\",\n    \"cart_data\": [\n        {\n            \"variant\": {\n                \"id\": 1\n            },\n            \"quantity\": 2\n        }\n    ]\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/checkout-total/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "checkout-total",
+                                ""
+                            ]
+                        },
+                        "description": "Calculate checkout total. Source: 'cart' (array of items) or 'buynow' (single item). Supports promo_code, shipping calculation by pincode. Free shipping for orders >= ₹499."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Calculate Checkout Total (Buy Now)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"source\": \"buynow\",\n    \"promo_code\": \"\",\n    \"pincode\": \"400001\",\n    \"paymentMethod\": \"ONLINE\",\n    \"cart_data\": {\n        \"item\": {\n            \"id\": 1\n        },\n        \"quantity\": 1\n    }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/calculate-total/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "calculate-total",
+                                ""
+                            ]
+                        },
+                        "description": "Calculate checkout total for single product buy-now flow. Source should be 'buynow' with cart_data containing item and quantity."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Payment Order (Cart)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"paymentMethod\": \"ONLINE\",\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"9876543210\",\n    \"address\": \"123 Main Street\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"country\": \"India\",\n    \"pincode\": \"400001\",\n    \"amount\": {\n        \"discount\": \"0.00\"\n    },\n    \"shipping\": {\n        \"company_id\": \"1\",\n        \"company_name\": \"Delhivery\",\n        \"company_rate\": 45\n    },\n    \"promo\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/create-razorpay-order/?source=cart",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "create-razorpay-order",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "source",
+                                    "value": "cart",
+                                    "description": "Order source: 'cart' or 'buynow'"
+                                }
+                            ]
+                        },
+                        "description": "Create an order and initiate PayU payment. For cart source: creates order from user's cart items. Returns PayU payment URL and params."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Payment Order (Buy Now)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"paymentMethod\": \"ONLINE\",\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"9876543210\",\n    \"address\": \"123 Main Street\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"country\": \"India\",\n    \"pincode\": \"400001\",\n    \"product\": {\n        \"item\": {\n            \"id\": 1\n        },\n        \"quantity\": 1\n    },\n    \"amount\": {\n        \"discount\": \"0.00\"\n    },\n    \"shipping\": {\n        \"company_id\": \"1\",\n        \"company_name\": \"Delhivery\",\n        \"company_rate\": 0\n    },\n    \"promo\": null\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/initiate-payment/?source=buynow",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "initiate-payment",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "source",
+                                    "value": "buynow",
+                                    "description": "Order source: 'buynow'"
+                                }
+                            ]
+                        },
+                        "description": "Create an order for buy-now flow and initiate PayU payment. Pass product item ID and quantity."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify Payment",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"txnid\": \"ICP20260302123ABCDE\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/verify-payment/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "verify-payment",
+                                ""
+                            ]
+                        },
+                        "description": "Verify PayU payment after redirect. Pass txnid (transaction ID). Updates order payment_status to 'Paid' and generates invoice."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Orders",
+            "description": "Order management (requires authentication)",
+            "item": [
+                {
+                    "name": "Get All Orders",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/orders/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                ""
+                            ]
+                        },
+                        "description": "Get all orders for the authenticated user. Returns order details with items."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Order Details",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/get-order/:order_id/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "get-order",
+                                ":order_id",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "order_id",
+                                    "value": "1",
+                                    "description": "Order ID"
+                                }
+                            ]
+                        },
+                        "description": "Get detailed order info with order items. Only the order owner can view."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Cancel/Delete Order",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/cancel-order/:id/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "cancel-order",
+                                ":id",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Order ID to cancel/delete"
+                                }
+                            ]
+                        },
+                        "description": "Delete/cancel an order by ID. Only the order owner can cancel."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Generate Invoice",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/generate-invoice/:order_number/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "generate-invoice",
+                                ":order_number",
+                                ""
+                            ],
+                            "variable": [
+                                {
+                                    "key": "order_number",
+                                    "value": "ICP12345",
+                                    "description": "Order number"
+                                }
+                            ]
+                        },
+                        "description": "Generate and retrieve invoice PDF for an order by order_number."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Order Change (Mark as Seen)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/order_change/?id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "order_change",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Order ID to mark as seen"
+                                }
+                            ]
+                        },
+                        "description": "Mark an order as 'seen' (sets is_new=False). Used by admin."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Order Check (Is New?)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/order_check/?id=1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "order_check",
+                                ""
+                            ],
+                            "query": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Order ID to check"
+                                }
+                            ]
+                        },
+                        "description": "Check if an order is new (is_new=True/False). Returns 'true' or 'false' string."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Promotions",
+            "description": "Promo codes and promotions",
+            "item": [
+                {
+                    "name": "Get All Promo Codes",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/get-promos/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "get-promos",
+                                ""
+                            ]
+                        },
+                        "description": "Get all available promotions/promo codes. Returns coupon_code, promotion_type, discount_type, discount_value, tag_line, start_date, end_date, is_active."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Newsletter",
+            "description": "Newsletter subscription management",
+            "item": [
+                {
+                    "name": "Subscribe to Newsletter",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john@example.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/subscribe-news-letter/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "subscribe-news-letter",
+                                ""
+                            ]
+                        },
+                        "description": "Subscribe to newsletter with email. Sends a welcome email on success."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Unsubscribe from Newsletter",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"john@example.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/unsubscribe-news-letter/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "unsubscribe-news-letter",
+                                ""
+                            ]
+                        },
+                        "description": "Unsubscribe from newsletter by email."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Contact Us",
+            "description": "Contact form submission",
+            "item": [
+                {
+                    "name": "Submit Contact Form",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"9876543210\",\n    \"subject\": \"Product Inquiry\",\n    \"message\": \"I would like to know more about your attar collection.\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/contact/",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "contact",
+                                ""
+                            ]
+                        },
+                        "description": "Submit a contact us form. Sends confirmation email to user and notification to admin."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}

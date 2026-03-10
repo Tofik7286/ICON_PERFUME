@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="content">
+    <h1 style="margin-bottom: 20px;">🧾 Confirm Refund</h1>
+
+    <div style="border: 1px solid #ccc; background: #f9f9f9; padding: 20px; border-radius: 8px; max-width: 500px;">
+        <h3>Are you sure you want to refund this transaction?</h3>
+
+        <table style="width: 100%; margin-top: 15px;">
+            <tr>
+                <th align="left">Transaction ID:</th>
+                <td>{{ transaction.id }}</td>
+            </tr>
+            <tr>
+                <th align="left">Amount:</th>
+                <td>₹{{ transaction.amount }}</td>
+            </tr>
+            <tr>
+                <th align="left">Payment ID:</th>
+                <td>{{ transaction.payment_id }}</td>
+            </tr>
+        </table>
+
+        <form method="post" action="{{ refund_url }}" style="margin-top: 30px;">
+            {% csrf_token %}
+            <input type="submit" value="✅ Yes, Refund Now" class="button button-danger" style="margin-right: 10px;">
+            <a href="{% url 'admin:mainapp_transaction_change' transaction.id %}" class="button">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

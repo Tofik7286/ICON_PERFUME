@@ -1,0 +1,33 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}New Contact Inquiry{% endblock %}
+
+{% block content %}
+<div style="margin: 20px 0; text-align: center;">
+  <h1 style="margin: 10px 0; font-size: 22px; font-weight: bold;">Hello Admin,</h1>
+  <p style="color: #555; font-size: 14px; line-height: 1.6;">
+    A new inquiry has been submitted via the "Contact Us" page. Below are the details:
+  </p>
+</div>
+
+<!-- User Details Section -->
+<div style="text-align: left; margin: 20px 0; font-size: 14px; color: #333; padding: 20px; background-color: #f9f9f9; border-radius: 5px;">
+  <p style="margin: 10px 0;"><span style="font-weight: bold; color: #433224;">Name:</span> {{ name }}</p>
+  <p style="margin: 10px 0;"><span style="font-weight: bold; color: #433224;">Email:</span> {{ email }}</p>
+  <p style="margin: 10px 0;"><span style="font-weight: bold; color: #433224;">Phone:</span> {{ phone }}</p>
+  <p style="margin: 10px 0;"><span style="font-weight: bold; color: #433224;">Subject:</span> {{ subject }}</p>
+  <p style="margin: 10px 0;"><span style="font-weight: bold; color: #433224;">Message:</span> {{ message }}</p>
+</div>
+
+<p style="color: #555; font-size: 14px; line-height: 1.6; color: #666; border-bottom: 1px dashed #666; padding-top: 20px; padding-bottom: 20px;">
+  Please review and respond to the user at your earliest convenience.
+</p>
+
+<p style="color: #555; font-size: 14px; line-height: 1.6;">
+  Thanks,<br>Icon Perfumes Team
+</p>
+{% endblock %}
+
+{% block footer %}
+<p>&copy; {{ current_year }} Icon Perfumes. All rights reserved.</p>
+{% endblock %}

@@ -1,0 +1,332 @@
+.shop {
+  font-size: var(--font);
+  background-color: var(--accent-color);
+  padding: 1em 0;
+}
+
+.shop h4 {
+  font-size: 1.5em;
+  font-weight: 600;
+}
+
+.filter_head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.8em !important;
+}
+
+.filter_items {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  flex-wrap: wrap;
+  margin-bottom: 1em;
+}
+
+.filter_items button {
+  background-color: var(--gray-color);
+  color: var(--text-color);
+  font-weight: 500;
+  padding: 0.3em 0.5em;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: 1em;
+}
+
+.filter {
+  width: 100%;
+  padding: 1em;
+  border-radius: 8px;
+}
+
+.filterSection {
+  margin-bottom: 1.2em;
+}
+
+.filter h2 {
+  font-size: 1.8em;
+  font-weight: 600;
+}
+
+.filter h3 {
+  font-size: 1.2em;
+}
+
+.filter .price_input {
+  width: 100%;
+  display: flex;
+  margin-top: 2em;
+  align-items: center;
+  gap: 1em;
+}
+
+.filter .price_input .field {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  /* border: 1px solid #999; */
+  background-color: var(--gray-color);
+  color: var(--text-color);
+  padding: 0.8em 1em;
+  border-radius: 8px;
+  border: 1px solid var(--gray-color);
+  transition: all 0.5s ease;
+}
+
+.filter .price_input .field span {
+  font-weight: 700;
+  font-size: 1.05em;
+}
+
+.filter .price_input .seperator {
+  font-weight: 500;
+  font-size: 1.1em;
+}
+
+.filter .price_input .field input {
+  width: 100%;
+  height: 100%;
+  outline: none;
+  font-size: 1.05em;
+  border-radius: 5px;
+  text-align: center;
+  text-align: end;
+  background: none;
+  -moz-appearance: textfield;
+}
+
+.filter .price_input .field:focus {
+  border-color: var(--text-color);
+}
+
+.filter .price_input .field input[type="number"]::-webkit-outer-spin-button,
+.filter .price_input .field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.filter .price_input .separator {
+  width: 5em;
+  display: flex;
+  font-size: 1em;
+  align-items: center;
+  justify-content: center;
+}
+.filter .slider {
+  margin-top: 1em;
+  height: 0.2em;
+  position: relative;
+  background: #ddd;
+  border-radius: 5px;
+}
+.filter .slider .progress {
+  height: 100%;
+  left: 25%;
+  right: 25%;
+  position: absolute;
+  border-radius: 5px;
+  background: var(--text-color);
+}
+.filter .range_input {
+  position: relative;
+}
+.filter .range_input input {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  top: -4px;
+  background: none;
+  pointer-events: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.filter input[type="range"]::-webkit-slider-thumb {
+  height: 1em;
+  width: 1em;
+  border-radius: 50%;
+  background: var(--text-color);
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-appearance: none;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+}
+.filter input[type="range"]::-moz-range-thumb {
+  height: 1em;
+  width: 1em;
+  border: none;
+  border-radius: 50%;
+  background: var(--text-color);
+  cursor: pointer;
+  pointer-events: auto;
+  -moz-appearance: none;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
+}
+
+.filter .colors {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 0.7em;
+  flex-wrap: wrap;
+}
+
+.filter .colors .colorCircle {
+  width: 2.5em;
+  height: 2.5em;
+  border: 1px solid #eee;
+  border-radius: 50%;
+  transition: all 0.5s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter .colors .colorCircle div {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  transition: all 0.3s ease-in;
+}
+
+.filter .colors .colorCircle:hover {
+  border-color: var(--text-color);
+}
+.filter .colors .colorCircle:hover div {
+  width: 80%;
+  height: 80%;
+}
+
+.filter .colors .colorCircle.active {
+  border-color: var(--text-color);
+}
+.filter .colors .colorCircle.active div {
+  width: 80%;
+  height: 80%;
+}
+
+.filter .label_list {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+}
+
+.filter .label_list label {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  font-size: 1.05em;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+}
+
+.closeBtn {
+  width: 2.3em;
+  height: 2.3em;
+  padding: 0.45em;
+  font-size: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* padding: .4em; */
+  margin: 0 0.1em;
+  border-radius: 50%;
+  cursor: pointer;
+  background-color: var(--gray-color);
+  transition: all 0.5s ease;
+}
+
+.closeBtn:hover {
+  background-color: #ccc;
+}
+
+.filter_btn {
+  display: none !important;
+}
+
+.apply {
+  font-size: 1em;
+  color: var(--text-color);
+}
+
+
+  .filter {
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    left: -40%;
+    width: 40%;
+    max-width: 500px;
+    z-index: 9999;
+    overflow-y: scroll;
+    transition: all 0.5s ease;
+    background-color: var(--bg-color);
+  }
+
+  .filter_backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .filter_backdrop.active {
+    pointer-events: auto;
+  }
+
+  .filter.active {
+    left: 0;
+  }
+
+  .filter_btn {
+    display: flex !important;
+  }
+
+
+@media (max-width: 768px) {
+  .filter {
+    width: 55%;
+    left: -55%;
+  }
+  .shop h4 {
+    font-size: 1.3em;
+  }
+}
+
+@media (max-width: 599px) {
+  .filter {
+    width: 70%;
+    left: -70%;
+  }
+  .shop h4 {
+    font-size: 1.2em;
+  }
+}
+
+@media (max-width: 449px) {
+  .filter {
+    width: 80%;
+    left: -80%;
+  }
+  .filter_items button {
+    font-size: .9em;
+  }
+}
+
+@media (max-width: 399px) {
+  .filter_items button {
+    font-size: .85em;
+  }
+}

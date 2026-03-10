@@ -1,0 +1,24 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Subscription Confirmation{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 20px 0;">
+  <h1 style="color: #333; font-size: 24px; margin: 0 0 20px 0;">Welcome to the Icon Perfumes Family!</h1>
+  <p style="font-size: 16px; color: #666; line-height: 1.5; margin-bottom: 30px;">
+    You've successfully subscribed to our exclusive newsletter!
+    Stay tuned for the latest updates, fragrance tips, and special announcements delivered straight to your inbox.
+  </p>
+  <a href="https://www.iconperfumes.in/shop/" style="display: inline-block; background-color: #433224; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-size: 16px; font-weight: 600; margin: 20px 0;">
+    Start Shopping
+  </a>
+  <p style="font-size: 16px; line-height: 1.5; color: #666; border-bottom: 1px dashed #666; padding: 20px 0;">
+    Thanks for being part of our family!
+  </p>
+</div>
+{% endblock %}
+
+{% block footer %}
+<p>- Team Icon Perfumes</p>
+<p>&copy; {{ current_year }} Icon Perfumes. All rights reserved.</p>
+{% endblock %}

@@ -1,0 +1,67 @@
+.review_form_box {
+  width: 100%;
+  height: 100%;
+}
+.review_title {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  font-family: inherit;
+}
+.review_box {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: 20px;
+  flex-direction: column;
+}
+.rating_star {
+  width: 100%;
+  display: flex;
+  /* gap: 2px; */
+  justify-content: center;
+  cursor: pointer;
+}
+.review_items {
+  width: 4em;
+  height: 4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.1s ease-in;
+}
+.review_icon {
+  font-size: 3em;
+  color: white;
+}
+.review_text_box textarea {
+  width: 100%;
+  height: 10em;
+  border: 1px solid black;
+  padding: 1.5em;
+  outline: none;
+  font-weight: 600;
+}
+.review_text_box textarea::placeholder {
+  font-weight: 500;
+}
+.review_submit {
+  display: flex;
+  justify-content: center;
+}
+.review_submit button {
+  padding: .5em 5em;
+  background-color: black;
+  color: white;
+  font-size: 1em;
+  border: 1px solid black;
+}
+.review_submit button:hover {
+  background-color: white;
+  color: black;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in;
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            color: #343a40;
+            text-align: center;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+            overflow: auto;
+            font-size: 14px;
+        }
+
+        /* Highlight log levels */
+        .log-info {
+            color: green;
+        }
+
+        .log-error {
+            color: red;
+        }
+
+        .log-warning {
+            color: orange;
+        }
+
+        .log-critical {
+            color: darkred;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Log File</h1>
+    <pre>
+        {% for line in logs.splitlines %}
+            {% if "INFO" in line %}
+                <span class="log-info">{{ line }}</span>
+            {% elif "ERROR" in line %}
+                <span class="log-error">{{ line }}</span>
+            {% elif "WARNING" in line %}
+                <span class="log-warning">{{ line }}</span>
+            {% elif "CRITICAL" in line %}
+                <span class="log-critical">{{ line }}</span>
+            {% else %}
+                {{ line }}
+            {% endif %}
+        {% endfor %}
+    </pre>
+</body>
+</html>

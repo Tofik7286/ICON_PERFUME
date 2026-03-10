@@ -1,0 +1,217 @@
+.container .section1 {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--font);
+}
+/* .container .section1 form{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+} */
+
+
+
+
+.section1 .deliverys {
+  display: flex !important;
+  gap: 20px;
+  /* justify-content: space-between; */
+}
+.section1 .deliverys label {
+  width: 38% !important;
+  display: flex;
+  gap: 5px;
+  padding: 0.7vw !important;
+}
+.section1 .deliverys label input {
+  width: 2vw !important;
+}
+.section1 form {
+  width: 100% !important;
+}
+.section1 form .address {
+  display: flex;
+  /* gap: 10px; */
+  justify-content: space-between;
+}
+.section1 form .address .city,
+.section1 form .address .state,
+.section1 form .address .pin_code {
+  width: 32% !important;
+}
+.section2 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.section2 .cart {
+  display: flex;
+  flex-direction: column;
+  /* gap: 10px; */
+}
+.section2 .cart .cart_box {
+  display: flex;
+  gap: 10px;
+}
+.section2 .cart .cart_box .image {
+  border-radius: 10% !important;
+  overflow: hidden;
+}
+.section2 .cart .item_description {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.section2 .totals .finalprice {
+  display: flex;
+  justify-content: space-between;
+}
+.container .section2 .payment i {
+  margin-right: 10px !important;
+}
+.container .section2 .payment .secure .encrypted i {
+  font-size: x-large !important;
+}
+.section2 .payment {
+  display: flex;
+  flex-direction: column;
+  /* gap: 20px; */
+}
+.section2 .payment .totals {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* .section2 .payment .pay{
+  padding: 0.8vw;
+  border-radius: 0.8vw !important;
+  background-color: rgb(47, 47, 194) !important;
+  color: white;
+  font-weight: 500;
+  letter-spacing: 1px;
+} */
+/* margin-bottom: 0px !important; */
+.section2 .secure .encrypted {
+  display: flex;
+  align-items: center;
+}
+.section2 .secure {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+@media (max-width: 1199px) {
+  .section1 .deliverys label input {
+    width: 15% !important;
+  }
+  .section1 .deliverys label {
+    padding: 0.5rem !important;
+  }
+}
+@media (max-width: 769px) {
+  .section1 .deliverys label {
+    padding: 0.6rem !important;
+  }
+  .section2 {
+    padding-top: 0px !important;
+  }
+  .section2 .cart h4 {
+    margin-top: 0px !important;
+    padding-top: 0px !important;
+  }
+}
+@media (max-width: 499px) {
+  .section1 .deliverys label {
+    width: 50% !important;
+    padding: 0.5rem !important;
+  }
+}
+
+
+.payment h3{
+  font-size: 2em;
+  font-weight: 600;
+}
+
+.cart_list{
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  height: 100%;
+}
+
+.addressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: .5em;
+  padding: 1em;
+  font-size: var(--font);
+  border-radius: .5em;
+  border: 2px solid rgb(0, 0, 0,0.1);
+  margin-bottom: 1em;
+}
+
+.addressItem {
+  display: flex;
+  width: 100%;
+  align-items: start;
+  gap: .8em;
+  padding: .5em;
+  transition: background 0.3s ease-in-out;
+  border-bottom: 1px solid var(--gray-color);
+}
+
+.addressItem:last-child{
+  border: none;
+}
+.payment button{
+  font-family: var(--font-bricolage);
+}
+.addressItem h6{
+  line-height: 100%;
+  font-size: 1.1em;
+  margin-bottom: .4em;
+  font-weight: bold;
+}
+
+.checkbox {
+  width: 1em;
+  height: 1em;
+  cursor: pointer;
+}
+
+.customRadio {
+  opacity: 0;
+  position: absolute;
+}
+
+/* Custom radio button */
+.radioCircle {
+  /* width: 18px;
+  height: 18px; */
+  padding: 8px;
+  border: 1.5px solid var(--text-color);
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Checked state: add inner dot */
+.customRadio:checked + .radioCircle::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background-color: var(--text-color);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.payment table{
+  width: 100%;
+}
+.payment tr td,.payment tr th{
+  padding: 1em 0;
+}

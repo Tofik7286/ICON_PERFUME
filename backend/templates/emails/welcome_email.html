@@ -1,0 +1,38 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Welcome to Icon Perfumes{% endblock %}
+
+{% block content %}
+<div style="text-align: left; padding: 20px;">
+  <h2 style="font-size: 24px; color: #333; margin-bottom: 20px;">
+    Welcome to Icon Perfumes, {{ user_name }}!
+  </h2>
+  <p style="font-size: 16px; line-height: 1.5; color: #666; margin-bottom: 20px;">
+    We're excited to have you join our community. At Icon Perfumes, we celebrate elegance and sophistication through our carefully curated collection of exquisite fragrances.
+  </p>
+  <p style="font-size: 16px; line-height: 1.5; color: #666; margin-bottom: 20px;">
+    As a valued member, you'll be the first to know about our latest arrivals, exclusive collections, and special events. We're here to help you find the perfect scent to express your unique style.
+  </p>
+  <p style="font-size: 16px; line-height: 1.5; color: #666;">
+    Feel free to explore our collection and reach out if you have any questions or need assistance.
+  </p>
+</div>
+
+<!-- Footer Banner -->
+<div style="text-align: center; margin-top: 20px;">
+  <img src="https://www.iconperfumes.in/icon_images/appointment_banner.webp" alt="Discover Icon Perfumes" style="width: 100%; border-radius: 10px; margin-bottom: 20px;" />
+</div>
+
+<!-- Call to Action -->
+<div style="text-align: center; margin-bottom: 20px;">
+  <a href="https://www.iconperfumes.in/shop/" style="display: inline-block; background-color: #433224; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 5px; font-weight: bold;">
+    Start Exploring
+  </a>
+</div>
+{% endblock %}
+
+{% block footer %}
+<p>We're glad to have you with us. If you ever need assistance, feel free to reply to this email or visit our website for more information.</p>
+<p style="margin: 10px 0;">&copy; {{ current_year }} Icon Perfumes. All rights reserved.</p>
+<p>- Team Icon Perfumes</p>
+{% endblock %}

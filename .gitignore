@@ -1,0 +1,61 @@
+# ==========================================
+# Icon Perfumes - Master GitIgnore
+# ==========================================
+
+# --- Django Specific ---
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+backend/tempdb.sqlite3
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- Media & Static (CRITICAL) ---
+# Inko server par hi rehne dena chahiye, GitHub par nahi
+media/
+media/*
+backend/media/
+backend/staticfiles/
+backend/static_root/
+
+# --- Environment & Secrets ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.venv
+venv/
+env/
+ENV/
+certs/
+
+# --- Next.js / Frontend ---
+frontend/node_modules/
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+.next/
+out/
+build/
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDEs ---
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# --- Packaging/Distribution ---
+dist/
+build/
+*.egg-info/
+.installed.cfg
+*.egg

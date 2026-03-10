@@ -1,0 +1,77 @@
+.testimonial{
+    font-size: var(--font);
+}
+.testimonial .item {
+    background-color: var(--gray-color);
+    padding: 2.5em 1.5em;
+    border-radius: 1.5em;
+    font-size: 1em;
+}
+
+.testimonial .item .user{
+    display: flex;
+    align-items: center;
+}
+
+.testimonial .item .user h5{
+    font-size: 1.2em;
+    font: 500;
+    color: var(--text-color);
+}
+.testimonial .item .content{
+    margin-top: 30px;
+}
+.testimonial .item .content p{
+    font-size: 1.2em;
+    font-weight: 500;
+    color: var(--text2-color);
+    text-align: justify;
+}
+
+.testimonial .item .content p span{
+    font-weight: bold;
+    font-size: 2em;
+    font-family: "Roboto Serif", serif;
+    line-height: 40%;
+}
+
+.testimonial .item .icon {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    width: 2.4em;
+    height: 2.4em;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: .7em;
+    transition: all .5s ease;
+    cursor: pointer;
+}
+
+.testimonial .item:hover .icon{
+    background-color: var(--accent2-color);
+}
+
+.testimonial .item .icon img{
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 999px) {
+    .testimonial .item {
+        background-color: var(--gray-color);
+        padding: 20px;
+        border-radius: 30px;
+        font-size: .9rem;
+    }
+    .testimonial .item .icon {
+        width: 2.2rem;
+        height: 2.2rem;
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+
+}

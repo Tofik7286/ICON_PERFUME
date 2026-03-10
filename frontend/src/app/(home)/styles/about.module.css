@@ -1,0 +1,330 @@
+/* General styles */
+.container {
+  background-color: #ffff;
+  color: #333;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: var(--font);
+}
+.hero {
+  width: 100%;
+}
+.navBtn {
+  padding: 10px 20px;
+  background-color: #f9bc60;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.container h2 {
+  font-size: 3em;
+  font-weight: bolder;
+  font-family: "Roboto", "sans-serif" !important;
+  margin-bottom: 0.3em !important;
+}
+
+.container p {
+  font-size: 1.3em;
+  line-height: 170%;
+}
+
+.container img {
+  border-radius: 2em;
+}
+
+.navBtn:hover {
+  background-color: #e0a650;
+}
+
+/* Hero Section */
+.hero {
+  padding: 3em 4em;
+  background-color: #fff;
+  align-items: center;
+}
+
+@media (max-width: 1199px) {
+  .hero {
+    padding: 3em;
+  }
+}
+
+@media (max-width: 999px) {
+  .hero {
+    padding: 3em;
+  }
+
+  .hero img {
+    width: 100% !important;
+  }
+
+  .container {
+    font-size: 0.8rem;
+  }
+}
+
+.footerLinks ul li a:hover {
+  text-decoration: underline;
+}
+.container .hero .heroContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 70vh !important;
+  width: 58%;
+  margin-left: 20px;
+  /* width: 50% !important; */
+}
+.container .hero .heroImage {
+  width: 45%;
+  overflow: hidden !important;
+}
+.container .hero .heroImage img {
+  width: 100%;
+}
+
+.courseSummary {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 8rem 0;
+}
+
+.banner_section {
+  padding: 3em 4em;
+  height: 30em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  /* padding-bottom:20rem; */
+  overflow: hidden; /* Ensures no overflow issues */
+}
+.side_image {
+  /* width: ; */
+  height: 100%;
+}
+
+.image_container {
+  position: relative; /* Container for image and text */
+  width: 100%;
+  height: 100%;
+  background-image: url("/images/about_footer_banner.png");
+  background-position: center;
+  background-size: cover;
+  border-radius: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.background_image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image covers the container */
+}
+
+.text_overlay {
+  font-family: "Roboto Serif", sans-serif;
+  text-align: center;
+  border-radius: 15px;
+  width: 70%;
+}
+
+.text_overlay h2 {
+  font-size: 3em;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  color: #010101;
+}
+
+.text_overlay p {
+  line-height: 1.6;
+  font-size: 1.2em;
+  color: #000;
+  font-weight: 400;
+  font-family: "Manrope";
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 28%;
+}
+
+.step {
+  padding: 15px;
+  background-color: #f1f1f1;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.step p {
+  margin: 0;
+  color: #777;
+}
+
+.step span {
+  font-weight: bold;
+  color: #004643;
+}
+
+.activeStep {
+  background-color: #004643;
+  color: white;
+}
+
+.activeStep p {
+  color: white;
+}
+.activeStep span {
+  color: white;
+}
+
+/* Content Area */
+.contentArea {
+  /* background-color: #004643; */
+  /* padding: 30px; */
+  width: 100%;
+  border-radius: 100px;
+  color: white;
+}
+
+.contentArea h3 {
+  margin-top: 0;
+  font-size: 1.8em;
+}
+
+.contentArea p {
+  margin: 20px 0;
+  font-size: 1.2em;
+}
+
+.contentArea img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.nextBtn {
+  padding: 10px 20px;
+  background-color: #f9bc60;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #004643;
+  font-weight: bold;
+}
+
+.nextBtn:hover {
+  background-color: #e0a650;
+}
+.container .hero:first-child {
+  border-top-left-radius: 2vw !important;
+  border-top-right-radius: 2vw !important;
+}
+
+/* Responsive Design */
+@media (max-width: 999px) {
+  .container .hero .heroImage {
+    width: 38% !important;
+    height: 100%;
+  }
+  .container .hero .heroImage img {
+    height: 100% !important;
+  }
+  .container .hero .heroContent {
+    width: 58% !important;
+  }
+  .ctaBtn {
+    width: 50% !important;
+  }
+
+  .banner_section {
+    padding: 2em;
+  }
+  .container .testimonials h2,
+  .container .pricing h2 {
+    text-align: center !important;
+    font-size: 2.5rem !important;
+  }
+  .container .pricing .pricingOptions .pricingCard {
+    width: 45% !important;
+  }
+
+  .container .image_container {
+    padding: 2em;
+  }
+
+  .container .text_overlay {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    gap: 10px !important;
+    text-align: center;
+  }
+
+  .banner_section {
+    padding: 24px;
+  }
+
+  .contentArea {
+    width: 100%;
+  }
+  .container .hero {
+    padding: 20px 20px !important;
+  }
+
+  .container .hero .heroImage {
+    height: 2em;
+    width: 2em;
+    object-fit: cover;
+  }
+
+  .banner_section .image_container {
+    padding: 4em;
+  }
+  .container .hero .heroContent p {
+    font-size: 1rem !important;
+  }
+  .container .hero .heroContent {
+    width: 53% !important;
+    text-align: left !important;
+  }
+  .ctaBtn {
+    width: 80% !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .banner_section .image_container {
+    padding: 4em 2em;
+  }
+}
+
+@media (max-width: 499px) {
+  .container h2 {
+    font-size: 2.5em;
+  }
+  .container .hero {
+    padding: 10px 10px !important;
+  }
+  .container p {
+    font-size: 1.15em;
+    line-height: 150%;
+  }
+  .banner_section {
+    padding: 13px;
+  }
+}

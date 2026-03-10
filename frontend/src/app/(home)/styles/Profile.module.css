@@ -1,0 +1,503 @@
+.form_container {
+  background-color: var(--accent-color);
+  width: 100%;
+  padding: 2em;
+  padding-bottom: 1em !important;
+}
+
+/* Sidebar styling */
+.sidebar {
+  background-color: var(--accent-color);
+  padding: 2em;
+  font-size: var(--font);
+  height: fit-content;
+}
+
+.sidebar h5 {
+  font-size: 1.5em;
+  margin-bottom: 0.5em !important;
+}
+
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+}
+
+.sidebar li a {
+  display: flex;
+  padding: 0.2em 0;
+  font-size: 1.15em;
+  font-weight: 500;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.sidebar li a svg {
+  font-size: 1.2em;
+}
+
+.sidebar li a.active {
+  font-weight: bold;
+  color: var(--accent2-color);
+}
+
+/* Main content styling */
+.main-content {
+  display: flex; /* Center the content */
+  flex-direction: column;
+  justify-content: center; /* Vertical alignment */
+  align-items: center; /* Horizontal alignment */
+  text-align: center;
+  padding: 20px;
+  font-size: var(--font);
+}
+
+.main-content .h1 {
+  color: #333333;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.main-content .p {
+  color: #666666;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.heading {
+  font-size: 1.5em;
+  margin-bottom: 0.5em !important;
+  font-weight: 600;
+}
+
+.button_container {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 10px; /* Space between buttons */
+  margin-top: 20px; /* Add space between form fields and buttons */
+  font-size: var(--font);
+}
+
+.button {
+  text-align: center;
+  padding: 0.4em 1.8em;
+  letter-spacing: 0.5px;
+  margin-top: 1em;
+  display: block;
+  font-size: .9em;
+  margin-top: 10px;
+  font-weight: 500;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  transition: all .5s ease;
+}
+
+
+
+.cancel_button {
+  text-align: center;
+  padding: 0.5em 1.3em;
+  color: var(--bg-color) !important;
+  letter-spacing: 0.5px;
+  margin-top: 1em;
+  display: block;
+  font-size: 1em;
+  background-color: var(--accent2-color);
+  background-color: rgb(236, 71, 71);
+  padding: 8px 15px;
+  margin-top: 10px;
+}
+
+.image_styles {
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  overflow: hidden;
+  margin-top: 1em;
+}
+
+.orders_container {
+  padding: 1em;
+  width: 100%;
+}
+
+.order_card {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1em;
+  padding: 1em;
+  position: relative;
+  background-color: var(--accent-color);
+}
+
+.order_image {
+  margin-right: 1em;
+}
+
+.order_details h5 {
+  margin: 0 0 0.5em 0;
+}
+
+.order_details p {
+  margin: 0.25em 0;
+}
+
+.status_delivered {
+  color: green;
+}
+
+.status_refunded {
+  color: red;
+}
+
+.product_name {
+  font-size: 18px;
+}
+
+/* modal.module.css */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modalContent {
+  background: #f0f8ff;
+  padding: 30px;
+  border-radius: 15px;
+  width: 500px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeader {
+  font-size: 24px;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.modalBody {
+  padding-top: 1em;
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal_button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 45%;
+}
+
+.modal_btnCancel {
+  border-radius: 20px;
+  background-color: var(--accent2-color);
+  color: black;
+  border: none;
+}
+
+.btnLogout {
+  border-radius: 20px;
+  background-color: #dc3545;
+  color: black;
+  border: none;
+}
+
+.icon {
+  display: inline-block;
+  background-color: #dc3545; /* Red color */
+  color: white;
+  border-radius: 50%;
+  padding: 15px;
+  margin-bottom: 15px;
+  font-size: 30px; /* Icon size */
+  text-align: center;
+  width: 60px; /* Circle size */
+  height: 60px; /* Circle size */
+  line-height: 30px;
+  margin: 0 auto;
+}
+
+.material-icons {
+  font-size: 36px; /* Icon size inside the circle */
+}
+
+.order_detail_container {
+  width: 100%;
+  padding: 20px;
+  background-color: var(--accent-color);
+  width: 100%;
+  /* background-color: #f8f9fa; */
+  font-size: calc(var(--font) + .1) ;
+  display: flex;
+  justify-content: center;
+}
+
+.order_card_detail {
+  background-color: var(--accent-color);
+  width: 100%;
+  /* background: #f8f9fa; */
+  /* box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); */
+  padding: 1.2em;
+  width: 100%;
+  /* max-width: 500px; */
+}
+
+.order_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.order_header h4{
+  font-size: 1.5em;
+}
+
+.view_details_button {
+  background-color: var(--accent2-color);
+  color: #fff;
+  padding: 8px 25px;
+  border-radius: 5px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.order_body {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  font-size: 1em;
+}
+
+.order_body h4 {
+  font-weight: 700;
+  font-size: 1.2em;
+}
+
+.order_detail_body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* gap: 30px; */
+}
+
+@media (max-width: 999px) {
+  .order_detail_body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .order_body h4 {
+    max-width: 27ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .order_card_detail {
+    padding: 1.5em;
+  }
+  .order_detail_container {
+    padding: 0px;
+    font-size: .8em;
+  }
+}
+
+@media (max-width: 599px) {
+  .order_body h4 {
+    max-width: 20ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .order_body{
+    font-size: .9em;
+  }
+}
+
+@media (max-width: 499px) {
+  .order_body h4 {
+    max-width: 16ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.price_detail_body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.price_detail_body div {
+  width: 100%;
+}
+
+@media (max-width: 999px) {
+  .price_detail_body div p {
+    justify-content: space-between;
+  }
+}
+
+.order_Detail_main {
+  gap: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status {
+  position: absolute;
+  right: 3%;
+  bottom: 10%;
+  color: var(--bg-color);
+  padding: 0.2em 0.6em;
+  font-size: 0.9em;
+  border-radius: 5px;
+}
+
+@media (max-width: 999px) {
+  .order_Detail_main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .orders_container {
+    padding: 0px;
+    font-size: 0.8rem;
+  }
+  .status {
+    position: static;
+    margin-top: 0.3em;
+    width: fit-content;
+  }
+}
+
+.order_progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px 0;
+  gap: 0.5em;
+}
+
+.progress_step {
+  color: #999;
+  position: relative;
+}
+.progress_step span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* display: block; */
+  width: 2.5em;
+  height: 2.5em;
+  line-height: 2.5em;
+  border-radius: 50%;
+  background-color: #999;
+  color: #fff;
+  margin: 0 auto;
+}
+
+.progress_step_active{
+  position: relative;
+}
+
+.progress_step p, .progress_step_active p {
+  font-size: 0.7em;
+  position: absolute;
+  top: 110%;
+  text-align: center;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: fit-content;
+  text-wrap: nowrap;
+}
+
+.progress_step_active {
+  color: var(--accent2-color);
+}
+
+.progress_step_active span {
+  /* display: block; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5em;
+  height: 2.5em;
+  line-height: 2.5em;
+  border-radius: 50%;
+  background-color: var(--accent2-color);
+  /* background-color: #4caf50; */
+  color: #fff;
+  margin: 0 auto;
+}
+
+.order_actions {
+  gap: 20px;
+  display: flex;
+  /* justify-content: space-between; */
+  margin-top: 20px;
+}
+
+.track_button,
+.cancel_button,
+.prepay_button {
+  padding: .4em 2em;
+  border: none;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.track_button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.cancel_button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.prepay_button {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.progress_line {
+  flex-grow: 1;
+  height: 4px;
+  background: #e0e0e0;
+  position: relative;
+}
+
+.progress_line_active {
+  /* background-color: #4caf50; */
+  background-color: var(--accent2-color);
+  /* background: #4caf50; */
+}

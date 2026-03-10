@@ -1,0 +1,238 @@
+.menuBar {
+    display: block;
+}
+
+.icon {
+    background-color: var(--gray-color);
+    color: var(--text-color) !important;
+    width: 2em;
+    height: 2em;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-right: .7em;
+    transition: all .5s ease;
+    cursor: pointer;
+}
+
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100vh;
+    width: 100%;
+    background: var(--text-color);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .5s ease;
+}
+
+
+.dropdown {
+    position: relative;
+    font-size: var(--font);
+}
+
+.dropdown span {
+    padding: .2em 1.2em;
+    font-size: 1em;
+    font-weight: 600;
+    border-radius: 3em;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background-color: var(--bg-color);
+}
+
+.dropdown span img {
+    width: 1.3em;
+    margin-right: .7em;
+}
+
+.dropdown span svg {
+    margin-left: 2em;
+    transition: all .5s ease;
+}
+
+.dropdown:hover span svg {
+    transform: rotate(180deg);
+}
+
+.dropdown .dropdown_content {
+    padding-left: 0px !important;
+    border-radius: 1.3em;
+    background-color: var(--bg-color);
+    overflow: hidden;
+    height: 0px;
+    pointer-events: auto;
+    transition: all .5s ease;
+}
+
+.dropdown:hover .dropdown_content {
+    height: calc(var(--dropdown-height) * 2.35em);
+    padding: .35em !important;
+}
+
+.dropdown .dropdown_content a {
+    transition: all .5s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: .3em 1em;
+    margin: .1em 0;
+    font-size: 1em;
+    border-radius: 2em;
+    font-weight: 600;
+    transition: all .5s ease;
+}
+
+.dropdown .dropdown_content a img {
+    width: 1.3em;
+    margin-right: 1em;
+}
+
+.dropdown .dropdown_content a:hover {
+    background-color: #eee;
+}
+
+
+.links {
+    flex-direction: column;
+    align-items: start;
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    bottom: 0;
+    left: -100%;
+    width: 300px;
+    z-index: 99999;
+    background-color: var(--bg-color);
+    transition: all .5s ease;
+    gap: 0px;
+    padding: 15px 20px !important;
+}
+
+.links a {
+    font-weight: 500;
+    font-size: 1.1em;
+    padding: 23px 0;
+    position: relative;
+    color: var(--text-color);
+}
+
+
+.links.menu {
+    left: 0;
+}
+
+
+.links li {
+    width: 100%;
+}
+
+.links a {
+    padding: 10px 0;
+    display: flex;
+    width: 100%;
+}
+
+.links .dropdown .dropdown_content {
+    position: static;
+    width: 100%;
+    background-color: #eee;
+}
+
+.links .dropdown:hover .dropdown_content {
+    padding: 5px !important;
+}
+
+.links .dropdown .dropdown_content a {
+    padding: 4px 11px !important;
+}
+
+.links .dropdown .dropdown_content a:hover {
+    background-color: #ccc;
+}
+
+
+.links .icon {
+    background-color: #eee;
+}
+
+.links .icon:hover {
+    background-color: #ccc;
+}
+
+.backdrop.menu {
+    opacity: .5;
+    pointer-events: auto;
+}
+
+.icon {
+    margin: 0 .2rem;
+}
+
+.icon.menu {
+    display: flex;
+}
+
+@media (max-width: 1199px) {
+
+    .links a {
+        font-size: 1rem;
+        padding: 10px 0;
+    }
+
+    .dropdown .dropdown_content {
+        width: 190px;
+        border-radius: 15px;
+    }
+
+    .dropdown span {
+        font-size: .8rem;
+        padding: 3px 18px;
+        border-radius: 30px;
+    }
+
+    .dropdown:hover .dropdown_content {
+        height: calc(var(--dropdown-height) * 29px);
+        padding: 4px !important;
+    }
+
+    .dropdown .dropdown_content a {
+        padding: 4px 11px;
+        border-radius: 30px;
+        font-size: .8rem;
+    }
+
+    .dropdown .dropdown_content a img {
+        width: 17px;
+        margin-right: 8px;
+    }
+
+    .dropdown span img {
+        width: 17px;
+        margin-right: 8px;
+    }
+
+    .dropdown span svg {
+        margin-left: 15px;
+    }
+
+    /* dropdown csss ehreh  */
+
+    .icon {
+        width: 2rem;
+        height: 2rem;
+        font-size: 1.4rem;
+        margin: 0 .1rem;
+    }
+
+
+}

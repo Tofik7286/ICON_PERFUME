@@ -1,0 +1,385 @@
+.herosection {
+  height: 100%;
+  width: 100%;
+  /* padding: 3.5rem; */
+  background-color: var(--gray-color);
+  position: relative;
+  border-radius: 2rem;
+  margin-bottom: 1rem;
+  /* background-image: url('../../../public/images/banner1.png');
+    background-position: top;
+    background-size: cover;
+    background-repeat: no-repeat; */
+  overflow: hidden;
+  color: var(--text-color);
+  font-size: var(--font);
+}
+
+.herosection img{
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes zoomBackground {
+  0% {
+    background-size: 120%;
+  }
+
+  100% {
+    background-size: 100%;
+    /* Adjust this value for more/less zoom */
+  }
+}
+
+.herosection .hero-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-progress-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background-color: rgba(255, 255, 255, 0.3);
+  z-index: 10;
+}
+.hero-progress-bar {
+  height: 100%;
+  background-color: var(
+    --accent2-color
+  ); /* Change the color to match your theme */
+  transition: width 0.1s linear;
+}
+
+.herosection .hero-content h1 {
+  font-size: 3em;
+  line-height: 130%;
+  font-weight: 400;
+}
+
+.herosection .hero-content h1 span {
+  font-family: "Roboto Serif", serif;
+  font-weight: bold;
+}
+
+.herosection .hero-content p {
+  font-size: 1.2em;
+  width: 60%;
+  color: var(--text2-color);
+}
+
+.herosection .hero-btn {
+  position: absolute;
+  bottom: 20%;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+}
+
+.herosection .hero-btn .hero-icon {
+  padding: 0.8em;
+  background-color: var(--bg-color);
+  font-size: 1.5em;
+  color: var(--text-color);
+  border-radius: 50%;
+  line-height: 1.25;
+}
+
+@media (max-width: 1199px) {
+  .herosection {
+    border-radius: 20px;
+  }
+
+  .herosection .hero-btn .hero-icon {
+    padding: 0.9rem;
+    font-size: 1.4rem;
+  }
+
+  .herosection .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .herosection .hero-content p {
+    font-size: 1.1rem;
+    width: 60%;
+    color: #555;
+  }
+}
+
+@media (max-width: 999px) {
+  .herosection {
+    margin-bottom: 0px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .herosection .hero-content {
+    width: 100%;
+  }
+
+  .herosection .hero-content h1 {
+    font-size: 2.3rem;
+  }
+
+  .herosection .hero-content p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 599px) {
+  .herosection .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .herosection .hero-content p {
+    width: 80%;
+  }
+}
+
+@media (max-width: 499px) {
+  .herosection .hero-content {
+    gap: 20px;
+  }
+
+  .herosection .hero-content h1 {
+    font-size: 1.8rem;
+  }
+
+  .herosection .hero-content p {
+    width: 100%;
+  }
+}
+
+/* progress bar csss rerhe  */
+
+.progress-container {
+  background-color: var(--gray-color);
+  height: 3px;
+  position: relative;
+  width: 100%;
+  border-radius: 50px;
+  margin-right: 20px;
+}
+
+.progress-bar {
+  background-color: var(--text2-color);
+  height: 70%;
+  margin-top: 1px;
+  display: block;
+  border-radius: 50px;
+  transform-origin: left;
+  transition: all 0.5s ease;
+}
+
+/* newsletter css herhehrhe  */
+
+.newsletter {
+  height: 70%;
+  width: 100%;
+  border-radius: 2em;
+  padding: 3.5em;
+  /* background-color: var(--accent2-color); */
+  background-image: url("/images/Newsletter Banner.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-size: 1em;
+  color: var(--bg-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.newsletter h2 {
+  font-size: 2.8em;
+  line-height: 170%;
+}
+
+.newsletter p {
+  font-size: 1em;
+  opacity: 0.8;
+}
+
+.newsletter .news-btn{
+  border: none !important;
+}
+
+.newsletter h2 span {
+  font-family: "Roboto Serif", serif;
+  font-weight: bold;
+}
+
+.newsletter form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1em;
+}
+
+.newsletter .news-image {
+  height: 20em;
+  width: 100%;
+}
+
+.newsletter .news-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.newsletter form input {
+  width: 70%;
+  padding: 0.7em 1.5em;
+  font-size: 1.1em;
+  border-radius: 2em;
+  line-height: 100%;
+  color: var(--text-color);
+  border: none;
+  outline: none;
+}
+
+.newsletter form button {
+  width: fit-content;
+}
+
+@media (max-width: 999px) {
+  .newsletter {
+    height: 600px;
+    border-radius: 2rem;
+    padding: 3.5rem;
+    font-size: 0.9rem;
+    background-image: url('/images/newsletter Mobile.jpg');
+    background-position: center;
+  }
+
+
+  .newsletter .news-image {
+    position: static;
+    display: none;
+  }
+  .newsletter h2 {
+    font-size: 2.5em;
+  }
+}
+
+@media (max-width: 768px) {
+  .newsletter {
+    height: 700px;
+    padding: 3rem;
+    background-position: center;
+  }
+  .newsletter h2{
+    line-height: 110%;
+  }
+  .newsletter h2 {
+    font-size: 2.2em;
+  }
+  .newsletter form input {
+    font-size: 1em;
+    width: 100%;
+  }
+}
+
+@media (max-width: 599px) {
+  .newsletter {
+    padding: 2rem;
+  }
+  .newsletter form input {
+    width: 100%;
+  }
+}
+
+/* category section herehr  */
+
+.category {
+  font-size: var(--font);
+  padding-top: 1rem !important;
+  padding-bottom: 3rem !important;
+  height: fit-content;
+}
+
+.category .category-item {
+  overflow: hidden;
+  border-radius: 12px;
+  height: fit-content;
+  position: relative;
+  display: block;
+}
+
+.category .category-item h4 {
+  position: absolute;
+  bottom: 5%;
+  left: 5%;
+  font-size: 1.2em;
+  background-color: var(--bg-color);
+  border-radius: 2em;
+  /* padding: 5px 16px; */
+  padding: 0.5em 1.4em;
+  font-weight: 700;
+}
+
+.category .category-item .ctc {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.category .category-item .ctc svg {
+  font-size: 1.5em;
+  width: 2em;
+  height: 2em;
+  padding: 0.4em;
+  margin-left: 10px;
+  background-color: var(--bg-color);
+  transform: rotate(-45deg);
+  border-radius: 50%;
+}
+
+@media (max-width: 1199px) {
+  .category .category-item .ctc {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .category {
+    padding-top: 30px !important;
+    padding-bottom: 30px !important;
+  }
+}
+
+@media (max-width: 599px) {
+  .category .category-item {
+    height: 20em;
+  }
+  .category .category-item img {
+    object-position: top;
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+  }
+  .category {
+    padding-top: 0px !important;
+  }
+}
+
+@media (max-width: 499px) {
+  .category .category-item {
+    height: 100%;
+  }
+  .category .category-item h4 {
+    font-size: .9em;
+  }
+  .category .category-item .ctc {
+    font-size: 0.7rem;
+  }
+}

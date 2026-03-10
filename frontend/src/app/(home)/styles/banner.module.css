@@ -1,0 +1,206 @@
+.banner {
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin: 3rem 0;
+  font-size: var(--font);
+}
+
+.banner::before {
+  content: attr(title);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  height: fit-content;
+  font-size: 22em;
+  z-index: 1;
+  text-transform: capitalize;
+  width: fit-content;
+  font-weight: bold;
+  font-family: "Roboto Serif", serif;
+  color: var(--gray-color);
+  pointer-events: none;
+}
+
+.banner .banner_image {
+  width: 90%;
+  height: 50em;
+  align-self: center;
+}
+
+.banner .banner_image img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.banner .banner_content {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner .item {
+  position: absolute;
+  z-index: 3;
+  background: rgba(243, 243, 243, 0.5);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  border-radius: 2em;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 1.4em;
+  font-size: 1em;
+  height: 13em;
+  width: 28em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.banner .item1 {
+  top: 5%;
+  left: 20%;
+}
+
+.banner .item2 {
+  bottom: 5%;
+  right: 20%;
+}
+
+.banner .item .item_content button {
+  font-size: 0.9em;
+  padding: 0.25em 1.5em;
+  background-color: var(--bg-color);
+  border-radius: 2em;
+  font-weight: 500;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  color: var(--text-color);
+  transition: all 0.5s ease;
+}
+
+.banner .item .item_content button:hover {
+  background-color: var(--accent2-color);
+  color: var(--bg-color);
+}
+
+.banner .item .item_content h5 {
+  font-size: 1.3em;
+  font-weight: 600;
+  max-width: 11ch; /* Limit text width to 15 characters */
+  white-space: nowrap; /* Prevent text from wrapping to the next line */
+  overflow: hidden; /* Hide overflowed content */
+  text-overflow: ellipsis;
+}
+
+.banner .item .item_content p {
+  font-size: 0.9em;
+}
+
+.banner .item .item_content .price {
+  font-size: 2em;
+  font-weight: 500;
+}
+
+.banner .item .item_content .price span {
+  font-size: 0.5em;
+  color: #777;
+  text-decoration: line-through;
+}
+
+.banner .item .item_img {
+  overflow: hidden;
+  height: 100%;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--gray-color);
+  border-radius: 1em;
+}
+
+.banner .item .item_img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 1199px) {
+  .banner .item {
+    padding: 15px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+  }
+  .banner .banner_image {
+    width: 100%;
+  }
+}
+
+@media (max-width: 999px) {
+  .banner .item1 {
+    top: 5%;
+    left: 10%;
+  }
+
+  .banner .item2 {
+    bottom: 5%;
+    right: 10%;
+  }
+  .banner .banner_content {
+    height: 650px;
+  }
+  .banner .banner_image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .banner::before {
+    top: -50%;
+  }
+}
+
+@media (max-width: 649px) {
+  .banner .item {
+    font-size: 0.8rem;
+  }
+  .banner .banner_content {
+    height: 550px;
+  }
+  .banner::before {
+    font-size: 25vw;
+  }
+}
+
+@media (max-width: 549px) {
+  .banner .item1 {
+    display: none;
+  }
+}
+
+@media (max-width: 499px) {
+  .banner::before {
+    top: -80%;
+  }
+  .banner .banner_content {
+    height: 475px;
+  }
+  .banner .item2 {
+    bottom: 5%;
+    left: 0;
+    margin: 0 auto;
+    width: fit-content;
+    right: 0%;
+  }
+}

@@ -1,0 +1,327 @@
+/* Container for the search bar */
+.searchContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+  font-size: var(--font);
+}
+
+.popup {
+  position: absolute;
+  top:0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  width: 100%;
+  pointer-events: none;
+  transition: all 0.5s ease;
+  z-index: 5;
+}
+
+.popup.active {
+  pointer-events: auto;
+}
+
+.popup .backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: white;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  transition: all 0.5s ease;
+  pointer-events: none;
+}
+.popup.active .backdrop {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.popup .popupContent {
+  position: absolute;
+  padding: 2em;
+  /* border-radius: 10px; */
+  text-align: center;
+  width: 100%;
+  max-width: 1600px;
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--bg-color);
+  height: fit-content;
+  flex-direction: column;
+  opacity: 1;
+  gap: 1em;
+  transition: all 0.5s ease;
+}
+
+.popup.active .popupContent {
+  top: 0;
+  opacity: 1;
+}
+.popup.active{
+  top: 100%;
+}
+.popup .popupContent .search {
+  width: 100%;
+}
+
+.bg_white {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+  width: 100%;
+  background-color: white;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  padding: 0.4em 1.3em;
+  background-color: var(--accent-color);
+  gap: 1em;
+  font-weight: 500;
+  width: 100%; /* Adjust width based on your preference */
+  margin: 0 auto; /* Centers the search input horizontally */
+}
+
+.search input {
+  border: none;
+  outline: none;
+  /* width: 100%; */
+  background: none;
+}
+
+.search svg {
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.search input {
+  width: 100%;
+  padding: 5px;
+  /* border: 1px solid #ccc; */
+  border-radius: 4px;
+}
+
+.suggestions {
+  position: static;
+  margin-top: 1px;
+   width: 100%;
+  display: flex;
+  padding: 0 1em;
+  height: 75vh;
+  overflow-y: scroll;
+  border-bottom: 5px solid rgb(0, 0, 0,0.1);
+  overflow-x: hidden;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.heading_suggest{
+  border-bottom: 1px solid rgb(0, 0, 0,0.1);
+  padding-bottom: .5em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1em;
+}
+.suggest_collection{
+  display: flex;
+  margin-top: 1em;
+  flex-direction: column;
+  gap: 1em;
+}
+.suggest_collection p{
+  text-align: left;
+  font-weight: 300 !important;
+  font-size: .9em !important;
+}
+.suggestions::-webkit-scrollbar {
+  width: 5px;
+  overflow: hidden;
+  /* Set the width of the scrollbar */
+}
+
+/* Track */
+.suggestions::-webkit-scrollbar-track {
+  background: var(--bg-color);
+  /* Color of the scrollbar track */
+}
+
+/* Handle */
+.suggestions::-webkit-scrollbar-thumb {
+  background: var(--accent2-color);
+  border-radius: 42px !important;
+  /* Color of the scrollbar handle */
+}
+
+/* Handle on hover */
+.suggestions::-webkit-scrollbar-thumb:hover {
+  background: var(--accent2-color);
+  /* Color of the scrollbar handle on hover */
+}
+
+.suggestions .suggests {
+  position: sticky;
+  top: 0;
+  padding: 1.5em 0;
+  padding-right: 2em !important;
+  width: 100%;
+}
+
+.suggestions .suggestsList {
+  padding: 1.5em 0;
+}
+
+.suggestions h3 {
+  padding: 0 2em;
+  font-size: 1.1em;
+  color: var(--text-color);
+  text-align: start;
+  font-weight: 700;
+  margin-bottom: 0.8em !important;
+}
+
+.suggestions ul {
+  padding: 0;
+  display: flex;
+  width: 100%;
+  align-items: start;
+  flex-direction: column;
+}
+.suggestions ul li{
+  padding: 0px !important;
+}
+.suggestions ul li a {
+  padding: 0.35em 2.5em;
+  font-weight: 500;
+  font-size: 0.95em;
+  text-align: start;
+  cursor: pointer;
+  width: 100%;
+}
+
+.suggestions ul li a:hover {
+  background-color: var(--gray-color);
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+  width: 100%;
+  padding: 0.4em 2em;
+  transition: all 0.5s ease;
+  cursor: pointer;
+}
+
+.suggestionItem:hover {
+  background-color: var(--gray-color);
+}
+
+.suggestionItem:last-child {
+  margin: 0;
+}
+
+.productImage {
+  width: 4.3em;
+  height: 4.3em;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.productDetails {
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  gap: 0.3em;
+}
+.productDetails h4 {
+  font-size: 0.95em;
+  margin: 0;
+  text-align: start;
+  color: var(--text-color);
+}
+
+.productDetails p {
+  color: #555;
+  margin: 0;
+}
+
+.sugguestFooter {
+  border-top: 1px solid #eee;
+  padding: 1em 2.5em;
+  text-align: start;
+}
+
+.sugguestFooter a {
+  font-weight: 500;
+  color: var(--text-color);
+  opacity: .9;
+  position: relative;
+}
+
+.sugguestFooter a::after{
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  width: 0%;
+  transition: all .5s ease;
+  opacity: .9;
+  background-color: var(--text-color);
+}
+
+.sugguestFooter a:hover::after{
+  width: 100%;
+}
+
+.sugguestFooter span {
+  color: var(--text-color);
+}
+
+.search_head {
+  display: none;
+}
+
+.desk_icon{
+  position: absolute;
+  right: 0%;
+  top: 10%;
+  background-color: var(--gray-color);
+  color: var(--text-color) !important;
+  width: 1.7em;
+  height: 1.7em;
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 0.7em;
+  transition: all 0.5s ease;
+  cursor: pointer;
+  z-index: 99;
+}
+
+.desk_icon:hover {
+  background-color: var(--accent2-color);
+  color: var(--bg-color) !important;
+}
+@media (max-width:778px){
+  .popupContent{
+    padding: 1em !important;
+  }
+  .suggestions{
+    height: 95vh;
+  }
+}

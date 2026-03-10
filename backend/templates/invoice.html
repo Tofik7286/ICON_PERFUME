@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice #{{ order.order_number }}</title>
+  <style>
+    @page { size: A4; margin: 1.5cm; }
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #333; margin: 0; padding: 0; }
+    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; }
+    .header h1 { font-size: 22px; margin: 0 0 5px; color: #111; }
+    .header p { margin: 2px 0; font-size: 11px; color: #666; }
+    .invoice-title { font-size: 18px; font-weight: bold; text-align: center; margin: 15px 0; color: #111; }
+    .meta-table { width: 100%; margin-bottom: 20px; }
+    .meta-table td { vertical-align: top; padding: 5px 0; }
+    .meta-table .label { font-weight: bold; color: #555; width: 140px; }
+    .section-title { font-size: 14px; font-weight: bold; margin: 20px 0 8px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+    table.items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    table.items th { background-color: #f5f5f5; border: 1px solid #ddd; padding: 8px 10px; text-align: left; font-size: 11px; font-weight: bold; }
+    table.items td { border: 1px solid #ddd; padding: 8px 10px; font-size: 11px; }
+    table.items tr:nth-child(even) { background-color: #fafafa; }
+    .text-right { text-align: right; }
+    .totals { width: 50%; margin-left: auto; margin-bottom: 20px; }
+    .totals td { padding: 5px 10px; font-size: 12px; }
+    .totals .total-row td { font-weight: bold; font-size: 14px; border-top: 2px solid #333; }
+    .footer { text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 10px; color: #999; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>ICON PERFUMES</h1>
+    <p>www.iconperfumes.in</p>
+  </div>
+
+  <div class="invoice-title">TAX INVOICE</div>
+
+  <table class="meta-table">
+    <tr>
+      <td style="width:50%;">
+        <table>
+          <tr><td class="label">Invoice No:</td><td>{{ order.order_number }}</td></tr>
+          <tr><td class="label">Date:</td><td>{{ order.order_date|date:"d M Y" }}</td></tr>
+          <tr><td class="label">Payment Method:</td><td>{{ order.payment_method }}</td></tr>
+          <tr><td class="label">Payment Status:</td><td>{{ order.payment_status }}</td></tr>
+          {% if order.transaction_id %}<tr><td class="label">Transaction ID:</td><td>{{ order.transaction_id }}</td></tr>{% endif %}
+        </table>
+      </td>
+      <td style="width:50%;">
+        <table>
+          <tr><td class="label">Bill To:</td><td>{{ order.name }}</td></tr>
+          <tr><td class="label">Email:</td><td>{{ order.email }}</td></tr>
+          <tr><td class="label">Phone:</td><td>{{ order.phone_number }}</td></tr>
+          <tr><td class="label">Address:</td><td>{{ order.address }}, {{ order.city }}, {{ order.state }} - {{ order.pincode }}</td></tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div class="section-title">Order Items</div>
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:5%;">#</th>
+        <th style="width:40%;">Product</th>
+        <th style="width:10%;">Qty</th>
+        <th style="width:15%;" class="text-right">Unit Price (₹)</th>
+        <th style="width:15%;" class="text-right">Discount (₹)</th>
+        <th style="width:15%;" class="text-right">Total (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ item.variant.product.title }}{% if item.variant.volume %} - {{ item.variant.volume }}{% endif %}</td>
+        <td>{{ item.quantity }}</td>
+        <td class="text-right">{{ item.price }}</td>
+        <td class="text-right">{{ item.discount }}</td>
+        <td class="text-right">{{ item.final_price }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr><td>Sub Total:</td><td class="text-right">₹ {{ order.sub_total }}</td></tr>
+    {% if order.discount and order.discount != "0.00" %}
+    <tr><td>Discount:</td><td class="text-right">- ₹ {{ order.discount }}</td></tr>
+    {% endif %}
+    {% if order.gst and order.gst != "0.00" %}
+    <tr><td>GST:</td><td class="text-right">₹ {{ order.gst }}</td></tr>
+    {% endif %}
+    <tr><td>Shipping:</td><td class="text-right">₹ {{ order.shipping_charges|default:"0.00" }}</td></tr>
+    <tr class="total-row"><td>Total Amount:</td><td class="text-right">₹ {{ order.final_price }}</td></tr>
+  </table>
+
+  <div class="footer">
+    <p>This is a computer-generated invoice and does not require a signature.</p>
+    <p>Thank you for shopping with Icon Perfumes!</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,565 @@
+.header {
+  width: 100%;
+  transition: all 0.5s ease; /* Smooth transition for position and shadow changes */
+  position: relative; /* Default position */
+  top: 0;
+  z-index: 9999; /* Keep it above other elements */
+  border-bottom: 1px solid #F5ECD9
+}
+
+.header.scrolled {
+}
+
+/* Animation for sliding down */
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  /* height: 70px; */
+  background-color: var(--bg-color);
+  font-size: var(--font);
+  transform: translateY(0); /* Ensure it's visible initially */
+}
+
+.header.scrolled .navbar {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-color);
+  z-index: 9999; /* Bring it to the top */
+  transform: translateY(0); /* Smoothly reset transform when scrolled */
+  animation: slide-down 0.5s ease; /* Add slide-down animation */
+}
+
+.navbar .logo {
+  font-size: 1.75em;
+  height: 100%;
+  width: 4.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto Serif", serif !important;
+}
+
+.navbar .logo img {
+  width: 100%;
+}
+
+.navbar .logo h4 {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 3em;
+  margin-bottom: 0px !important;
+  padding-left: 0px !important;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: fit-content;
+  margin: auto;
+}
+
+.links a {
+  font-weight: 500;
+  font-size: 1.1em;
+  padding: 20px 0;
+  color: var(--text-color) !important;
+  position: relative;
+}
+
+.links a::after {
+  position: absolute;
+  content: "";
+  bottom: 30%;
+  left: 0;
+  width: 0%;
+  height: 1px;
+  background-color: var(--text-color);
+  transition: all 0.5s ease;
+}
+
+.links a:hover::after {
+  width: 100%;
+}
+
+.links a.active {
+  font-weight: bold;
+}
+
+.links a.active::after {
+  width: 100%;
+}
+
+/* dropdown csss starts sherher  */
+
+.dropdown {
+  z-index: 999;
+  position: relative;
+}
+
+.dropdown span {
+  padding: 0.2em 1.2em;
+  font-size: 1em;
+  font-weight: 600;
+  border-radius: 3em;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background-color: var(--bg-color);
+}
+
+.dropdown span img {
+  width: 1.3em;
+  margin-right: 0.7em;
+}
+
+.dropdown span svg {
+  margin-left: 2em;
+  transition: all 0.5s ease;
+}
+
+.dropdown:hover span svg {
+  transform: rotate(180deg);
+}
+
+.dropdown .dropdown_content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 14em;
+  padding-left: 0px !important;
+  border-radius: 1em;
+  background-color: var(--bg-color);
+  overflow: hidden;
+  height: 0px;
+  transition: all 0.5s ease;
+}
+
+.dropdown:hover .dropdown_content {
+  height: calc(var(--dropdown-height) * 2.25em);
+  padding: 0.35em !important;
+}
+
+.dropdown .dropdown_content a {
+  transition: all 0.5s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0.3em 1em;
+  font-size: 1em;
+  border-radius: 2em;
+  font-weight: 600;
+  transition: all 0.5s ease;
+}
+
+.dropdown .dropdown_content a img {
+  width: 1.3em;
+  margin-right: 1em;
+}
+
+.dropdown .dropdown_content a:hover {
+  background-color: #eee;
+}
+
+.navbar .search {
+  display: flex;
+  align-items: center;
+  font-size: 1.1em;
+  padding: 0.65em 1.5em;
+  width: 23em;
+  background-color: var(--gray-color);
+  gap: 1em;
+  margin-left: 15px;
+  border-radius: 3em;
+}
+
+.navbar .search input {
+  border: none;
+  outline: none;
+  width: 100%;
+  background: none;
+}
+
+.navbar .search svg {
+  font-size: 1.6em;
+  cursor: pointer;
+}
+
+.menu {
+  display: none;
+  align-items: center;
+  gap: 1em;
+  padding: 0.6em 1.5em;
+  border-radius: 3em;
+  background-color: var(--text-color);
+  color: white;
+  cursor: pointer;
+  font-size: 1.15em;
+  transition: all 0.5s ease;
+}
+
+.menu:hover {
+  background-color: var(--accent2-color);
+  color: var(--bg-color) !important;
+}
+
+.icon {
+  color: var(--text-color) !important;
+  width: 2em;
+  height: 2em;
+  font-size: 1.4em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-right: 0.7em;
+  transition: all 0.5s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.icon.bag {
+   color: var(--text-color) !important;
+}
+
+.icon:last-child {
+  margin-right: 0px !important;
+}
+
+.icon.badge::before {
+  content: attr(total);
+  position: absolute;
+  top: -12%;
+  right: -12%;
+  font-size: 0.7em;
+  background-color: var(--text-color);
+  width: 1.4em;
+  height: 1.4em;
+  font-weight: 800;
+  display: flex;
+  color: var(--bg-color);
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-weight: 500;
+}
+
+.icon:hover {
+  background-color: var(--accent2-color);
+  color: var(--bg-color) !important;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  font-size: 1.1em;
+}
+
+.user h6 {
+  font-size: 1em;
+  font-weight: 600;
+  line-height: 100%;
+  gap: 0px;
+  text-transform: capitalize;
+}
+
+.user span {
+  font-size: 0.75em;
+}
+
+/* promo section ehre  */
+
+.promo {
+  position: relative;
+  background-color: var(--accent2-color);
+  color: var(--bg-color);
+  font-size: var(--font);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4em;
+  z-index: 10;
+  /* Additional styles for your promo container */
+}
+
+.promo2 {
+  background-color: var(--text-color);
+  gap: 1em;
+  text-transform: uppercase;
+  font-weight: 300;
+  flex-wrap: wrap;
+}
+
+.promo2 p {
+  width: fit-content !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: text !important;
+}
+
+.promo2 p svg {
+  font-size: 1.2em;
+}
+
+.promo2 span {
+  height: 1.2em;
+  width: 1px;
+  background-color: var(--bg-color);
+}
+
+.promo p {
+  cursor: pointer;
+  font-size: 0.95em;
+  text-align: center;
+}
+
+.swiperButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fff;
+  font-size: 1.4em;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.prevButton {
+  left: 2em;
+}
+
+.nextButton {
+  right: 2em;
+}
+
+
+@media (max-width: 1199px) {
+  .navbar{
+    height: 70px;
+  }
+  .logo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: fit-content;
+    margin: auto;
+  }
+
+  .links a {
+    font-weight: 500;
+    font-size: 1rem;
+    padding: 20px 0;
+    position: relative;
+    color: var(--text-color);
+  }
+  .navbar .search {
+    font-size: 1rem;
+    padding: 7px 25px;
+    gap: 10px;
+    margin-left: 15px;
+    border-radius: 30px;
+    width: 250px;
+  }
+  .menu {
+    gap: 10px;
+    padding: 7px 25px;
+    border-radius: 30px;
+    font-size: 1rem;
+  }
+  .icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    font-size: 1.2rem;
+    margin-right: 10px;
+  }
+
+  .icon.bag::before {
+    font-size: 0.7rem;
+    width: 1rem;
+    height: 1rem;
+  }
+  .user {
+    font-size: 0.9rem;
+  }
+  .menu {
+    display: flex;
+  }
+  .links {
+    display: none;
+  }
+}
+
+@media (max-width: 999px) {
+  .navbar .search {
+    width: fit-content;
+    padding: 11px;
+  }
+  .navbar .search input {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .promo p {
+    width: 90%;
+    font-size: 0.85em;
+  }
+  .prevButton {
+    left: 1em;
+  }
+
+  .nextButton {
+    right: 1em;
+  }
+}
+
+@media (max-width: 599px) {
+
+  .icon {
+    margin-right: 8px;
+    font-size: 1.1rem;
+  }
+
+  .user a {
+    margin-right: 0px;
+  }
+  .user .profile {
+    display: none;
+  }
+  .navbar .search {
+    margin-left: 8px;
+  }
+  .navbar .search svg {
+    font-size: 1.1rem;
+  }
+  .menu span {
+    display: none;
+  }
+  .menu {
+    padding: 11px;
+    font-size: 1.1rem;
+  }
+  .promo2 {
+    gap: 0.5em;
+  }
+  .promo2 span {
+    margin: 0 0.5em;
+  }
+  .prevButton {
+    left: .5em;
+  }
+
+  .nextButton {
+    right: .5em;
+  }
+}
+
+@media (max-width: 449px) {
+  .navbar {
+    height: 60px;
+  }
+  .icon.wishlist {
+    display: none;
+  }
+  .navbar .logo {
+    width: 4em;
+  }
+  .icon {
+    width: 2.1em;
+    height: 2.1em;
+    font-size: 1rem;
+  }
+  .menu {
+    padding: 8px;
+    font-size: 1rem;
+  }
+  .promo p {
+    width: 90%;
+    font-size: 0.85em;
+  }
+}
+
+@media (max-width: 399px) {
+  .promo p {
+    font-size: 0.75em;
+  }
+}
+
+.cat_dropdown {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+}
+
+.dropdownTrigger {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  cursor: pointer;
+}
+
+
+
+.submenu {
+  position: absolute;
+  top: 100%;
+  left: -100%;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  background: var(--bg-color);
+  padding: 15px 20px;
+  list-style: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 15em;
+}
+
+.cat_dropdown:hover .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0px);
+}
+.chevron {
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.cat_dropdown:hover .chevron {
+  transform: rotate(180deg);
+}
+
+.submenu li {
+  padding: 10px 20px;
+  transition: background 0.3s ease;
+  font-size: .9em !important;
+  cursor: pointer;
+}
+
+.submenu li:hover {
+  background-color: var(--accent-color);
+}
+
+

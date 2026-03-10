@@ -1,0 +1,9 @@
+{% extends "admin/change_form.html" %}
+{% block object-tools-items %}
+    {{ block.super }}
+    {% if show_refund_button %}
+    <li>
+        <a href="{{ refund_url }}" class="btn btn-block btn-warning btn-sm mt-3">Refund</a>
+    </li>
+    {% endif %}
+{% endblock %}

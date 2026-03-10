@@ -1,0 +1,113 @@
+
+.popup {
+  box-shadow: 10px 0px 30px rgb(0, 0, 0, 0.1);
+  position: fixed;
+  z-index: 99999;
+  background-color: var(--bg-color);
+  border-radius: 1.5em;
+  width: 40%;
+  height: fit-content;
+  bottom: 1em;
+  right: 1em;
+  overflow: hidden;
+  animation: inView 1.5s;
+  font-size: var(--font);
+}
+.cookie_box {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1.5em;
+}
+.background {
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  border-radius: 0.6em;
+  height: 100%;
+  width: 100%;
+  background-attachment: var(--bg-color);
+}
+.background1 {
+  clip-path: ellipse(276px 222px at 100% 10%);
+  right: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--gray-color);
+}
+.title {
+  display: flex;
+  gap: 5px;
+}
+.box_title {
+  font-size: 2em;
+  font-weight: bold;
+}
+.description {
+  font-size: 0.9em;
+}
+.buttons {
+  display: flex;
+  gap: 1em;
+}
+.cookie_button {
+  padding: 0.6em 1.3em;
+  background-color: var(--gray-color);
+  border-radius: 1.5em;
+  cursor: pointer;
+  color: var(--bg-color);
+  font-size: 1em;
+  font-weight: bold;
+  transition: 0.4s ease-in;
+}
+.accept_button {
+  background-color: rgb(69, 224, 69);
+}
+.reject_button {
+  background-color: rgb(214, 55, 55);
+}
+
+@media only screen and (max-width: 800px) {
+  .popup {
+    width: 96%;
+    height: fit-content;
+    bottom: 5px;
+    animation: inMobView 1.5s;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+  }
+  .title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .buttons {
+    display: block;
+  }
+  .cookie_button {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  .cookie_button:last-child {
+    margin-bottom: 0px;
+  }
+}
+@keyframes inView {
+  from {
+    bottom: -100px;
+  }
+  to {
+    bottom: 15px;
+  }
+}
+@keyframes inMobView {
+  from {
+    bottom: -100px;
+  }
+  to {
+    bottom: 0px;
+  }
+}

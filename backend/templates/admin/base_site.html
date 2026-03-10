@@ -1,0 +1,52 @@
+{% extends "admin/base_site.html" %}
+
+{% block sidebar %}
+
+{{ block.super }} <!-- Retain existing sidebar content -->
+
+<!-- <script>
+    let navItems = document.querySelectorAll('a');  // Select all <a> elements
+
+    navItems.forEach(navItem => {
+        console.log("Navite",navItem);
+        if (navItem.children[1] && navItem.children[1].textContent === "Dashboard") {
+            // If the href matches '/admin/', perform your logic
+            console.log('URL matches /admin/');
+            let nav_item = document.createElement('li')
+            nav_item.setAttribute('class','nav-item');
+
+            var link = document.createElement('a');
+
+            // Set the href attribute
+            link.setAttribute('href', '/admin/analytics/');
+            link.setAttribute('class', 'nav-link');
+
+            // Create the icon <i> element
+            var icon = document.createElement('i');
+            icon.setAttribute('class', 'nav-icon fa fa-bar-chart');
+
+            // Create the <p> element for text content
+            var paragraph = document.createElement('p');
+            paragraph.textContent = 'Analytics';
+
+            // Append the icon and paragraph to the <a> element
+            link.appendChild(icon);
+            link.appendChild(paragraph);
+            nav_item.appendChild(link);
+            
+            navItem.parentElement.parentElement.insertBefore(nav_item,navItem.parentElement.parentElement.children[1]);
+
+        }
+    });
+</script> -->
+{% endblock %}
+{% block footer %}
+<footer class="main-footer ">
+    <div class="float-right d-none d-sm-inline">
+        <b>Admin Panel</b> 1.0.0
+    </div>
+    
+        <strong>© 2025 Webify.ai</strong> All rights reserved.
+    
+</footer>
+{% endblock %}

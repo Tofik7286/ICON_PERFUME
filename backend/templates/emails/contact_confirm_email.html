@@ -1,0 +1,23 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Contact Inquiry Confirmation{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 20px;">
+  <h1 style="font-size: 22px; font-weight: bold; color: #333; margin: 10px 0;">Hello {{ name }},</h1>
+  <p style="color: #555; font-size: 14px; line-height: 1.6;">
+    Dear <strong>{{ name }}</strong>,<br>
+    Thank you for reaching out to us! We've received your inquiry and will get back to you within 24-48 hours.
+    Our team is here to help with any questions regarding our premium perfumes/attars, orders, or policies. If your inquiry is urgent,
+    feel free to send us a mail at <a href="mailto:info@iconperfumes.in" style="color:#433224">info@iconperfumes.in</a>.
+  </p>
+  <p style="color: #555; font-size: 14px; line-height: 1.6; color: #666; border-bottom: 1px dashed #666; padding-top: 20px; padding-bottom: 20px;">
+    We appreciate your interest and look forward to assisting you.
+  </p>
+</div>
+{% endblock %}
+
+{% block footer %}
+<p>Best Regards,<br>Team Icon Perfumes</p>
+<p>&copy; {{ current_year }} Icon Perfumes. All rights reserved.</p>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "admin/change_list.html" %}
+
+{% block content %}
+    {% if cl.show_full_result_count %}
+    <ul class="pagination pagination-sm m-0 float-right mb-2">
+        {% if cl.paginator.num_pages > 1 %}
+
+                {% if cl.page_num > 1 %}
+	            <li class="page-item previous">
+       	            <a class="page-link" href="{{ cl.get_query_string }}p{{ cl.PAGE_VAR }}=1" data-dt-idx="0" tabindex="0">«</a>
+                    </li>    
+                {% endif %}
+                {% for i in cl.paginator.page_range %}
+                    {% if i == cl.page_num %}
+                         <li class="page-item active">
+         		   <a class="page-link" href="javascript:void(0);" data-dt-idx="3" tabindex="0">{{ i }}</a>
+		        </li>
+                    {% elif i > cl.page_num|add:"-5" and i < cl.page_num|add:"5" %}
+                        <!--<a href="{{ cl.get_query_string }}&amp;{{ cl.PAGE_VAR }}={{ i }}">{{ i }}</a>-->
+                        <li class="page-item">
+                         <a href="{{ cl.get_query_string }}p{{ cl.PAGE_VAR }}={{ i }}" class="page-link end" data-dt-idx="3" tabindex="0">{{i}}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if cl.page_num < cl.paginator.num_pages %}
+
+                    <li class="page-item next ">
+                      <a class="page-link" href="{{ cl.get_query_string }}p{{ cl.PAGE_VAR }}={{ cl.paginator.num_pages }}" data-dt-idx="7" tabindex="0">»</a>
+                    </li>
+                {% endif %}
+
+        {% endif %}
+    </ul>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+
+{% block result_list %}
+<style>
+    .new-order {
+        background-color: rgb(200 245 200) !important; /* or any other highlighting style */
+    }
+</style>
+<script>
+    window.addEventListener('load', function () {
+        var rows = document.querySelectorAll('.even');
+        var rows2 = document.querySelectorAll('.odd');
+        if(location.pathname !== "/admin/mainapp/order/"){
+                return;
+        }
+        rows.forEach(function (row) {
+            let field_id = row.querySelector(".field-id")
+            let id = field_id.children[0].innerHTML
+            $.ajax({
+                method: "GET",
+                url: "/api/order_check/",
+                data: { "id": id },
+                success: function (data) {
+                    if (data === "true") {
+                        row.classList.add('new-order');
+                    } else if (data === "false") {
+                        row.classList.remove('new-order');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+
+                }
+            })
+            field_id.addEventListener('click', function () {
+                // Remove the custom class when clicking on the order
+                let id = field_id.children[0].innerHTML
+                $.ajax({
+                    method: "GET",
+                    url: "/api/order_change/",
+                    data: { "id": id },
+                    success: function (data) {
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+
+                    }
+                })
+
+                // You might want to make an AJAX call to update the is_new field in the database
+            });
+        });
+        rows2.forEach(function (row) {
+            // Find the .field-is_new element within the row
+
+            // Add click event listener to handle the highlighting
+            let field_id = row.querySelector(".field-id")
+            let id = field_id.children[0].innerHTML
+            $.ajax({
+                method: "GET",
+                url: "/api/order_check/",
+                data: { "id": id },
+                success: function (data) {
+                    console.log("SUCCESS", data)
+                    if (data === "true") {
+                        row.classList.add('new-order');
+                    } else if (data === "false") {
+                        row.classList.remove('new-order');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+
+                }
+            })
+            field_id.addEventListener('click', function () {
+                // Remove the custom class when clicking on the order
+                let id = field_id.children[0].innerHTML
+
+                $.ajax({
+                    method: "GET",
+                    url: "/order_change/",
+                    data: { "id": id },
+                    success: function (data) {
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+
+                    }
+                })
+
+                // You might want to make an AJAX call to update the is_new field in the database
+            });
+        });
+    });
+</script>
+{{ block.super }}
+{% endblock %}

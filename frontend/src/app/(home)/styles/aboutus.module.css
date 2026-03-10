@@ -1,0 +1,18 @@
+.about_hero{
+    font-size: var(--font);
+}
+.aboutsec_2{
+    background-color: var(--accent-color);
+    margin-top: 5em;
+}
+.aboutsec_3{
+    background-color: var(--accent-color);
+}
+.aboutsec_4{
+    background-color: var(--accent-color);
+}
+.aboutsec_3 h4{
+    font-size: 2em !important;
+    font-weight: 300 !important;
+    margin-bottom: .5em !important;
+}

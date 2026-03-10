@@ -1,0 +1,25 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}{{ header }}{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 20px;">
+  <h2 style="font-size: 24px; color: #333; margin-bottom: 20px;">{{ header }}</h2>
+  <p style="font-size: 16px; line-height: 1.5; color: #666;">
+    {{ message }}
+  </p>
+
+  <div style="padding: 20px; background-color: #f1f1f1; border-radius: 10px; margin: 20px 0; font-size: 36px; font-weight: bold; color: #333; text-align: center;">
+    {{ otp }}
+  </div>
+
+  <p style="font-size: 16px; line-height: 1.5; color: #666; border-bottom: 1px dashed #666; padding-top: 10px; padding-bottom: 20px;">
+    Didn't request this email? You can safely ignore it.
+  </p>
+</div>
+{% endblock %}
+
+{% block footer %}
+<p>This email was sent to you because you started signing up for an account at Icon Perfumes.</p>
+<p>&copy; {{ current_year }} Icon Perfumes. All rights reserved.</p>
+{% endblock %}

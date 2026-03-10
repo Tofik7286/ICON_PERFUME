@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Icon Perfumes{% endblock %}</title>
+  <style>
+    @media (max-width: 499px) {
+      body { font-size: 14px !important; }
+      .container { margin: 20px auto; padding: 4vw !important; border-radius: 3vw !important; }
+      .footer { font-size: 11px !important; }
+    }
+  </style>
+  {% block extra_styles %}{% endblock %}
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0;">
+  <div class="container" style="max-width: 600px; background-color: #ffffff; margin: 40px auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+
+    <!-- Header -->
+    <div style="background-color: #FFFBF3; border-radius: 10px 10px 0 0; text-align: center; padding: 20px;">
+      <img src="https://www.iconperfumes.in/_next/image/?url=%2Ficon_images%2Flogo.png&w=256&q=75"
+           alt="Icon Perfumes Logo"
+           style="height: 51px; width: 132px; object-fit: contain;" />
+    </div>
+
+    <!-- Content -->
+    {% block content %}{% endblock %}
+
+    <!-- Footer -->
+    <div class="footer" style="font-size: 12px; color: #888; text-align: center; border-top: 1px solid #eee; padding: 10px 0;">
+      {% block footer %}
+      <p>&copy; {{ current_year }} Icon Perfumes. All rights reserved.</p>
+      {% endblock %}
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+.content {
+  font-size: 0.9em;
+}
+@media (max-width: 768px) {
+  .content {
+    font-size: 0.9em;
+  }
+}
+.content h2 {
+  font-weight: bolder;
+}
+.content a {
+  color: blue !important;
+}
+.content h1 {
+  font-size: 3em !important;
+  font-weight: 500 !important;
+}
+.content .curved_heading{
+    font-family: "Roboto Serif", serif !important;
+    font-weight: 600 !important;
+    font-size: 2em ;
+}
+.sec_3 h2 {
+  font-size: 2.8em !important;
+}
+.sec_4{
+    background-color: #00000080;
+    background-image:url("/images/influencer_join (1).webp");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-size: var(--font);
+   background-blend-mode: color;
+   overflow: hidden;
+   border-radius: 1.2em;
+}
+.sec_4 h2 {
+  font-size: 3em !important;
+}
+.in_sec1 h2 {
+  font-size: 3em !important;
+}
+.in_sec1 h3,
+.in_sec3 h3,
+.last_sec h3 {
+  font-weight: bolder !important;
+  font-size: 1.8em !important;
+}
+.last_sec {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+.in_sec3 {
+  display: flex;
+  justify-content: center;
+}
+.disocunt_icon {
+  width: 5em;
+  height: 5em;
+  flex-shrink: 0;
+  border-right: 2px solid black;
+  border-radius: 50%;
+  padding: 1em;
+}
+.item::-webkit-scrollbar {
+  display: none;
+}
+.active_list {
+  transition: all 0.5s ease-in-out;
+  animation: faq 0.5s ease-in-out;
+}
+.last_sec h2 {
+  font-size: 3em !important;
+}
+@keyframes faq {
+  0% {
+    opacity: 0.2;
+    height: 0;
+  }
+  100% {
+    opacity: 1;
+    height: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .sec_4 h2 {
+    font-size: 2.5em !important;
+  }
+  .in_sec1 h2 {
+    font-size: 2em !important;
+  }
+  .last_sec h2 {
+    font-size: 2.5em !important;
+  }
+  .sec_3 h2 {
+    font-size: 2.5em !important;
+  }
+  .content .curved_heading {
+    font-size: 2em !important;
+  }
+  .in_sec1 h3,
+.in_sec3 h3,
+.last_sec h3 {
+  font-weight: bolder !important;
+  font-size: 1.4em !important;
+}
+}
+.slider_item {
+  background-color: rgb(0, 0, 0, 0.05);
+  border-radius: 1em;
+}
+.star {
+  display: flex;
+  gap: 0.5em;
+  color: var(--accent2-color);
+}
+.my_text_wrapper::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: white !important;
+  white-space: nowrap;
+  transform: translate3d(-50%, -50%, 0);
+  transition: all 0.65s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.content h2{
+  font-size: 2em !important;
+}

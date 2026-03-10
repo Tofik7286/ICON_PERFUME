@@ -1,0 +1,39 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Price Drop Alert - Icon Perfumes{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 20px 0;">
+  <h1 style="font-size: 28px; font-weight: bold; color: #333; margin-bottom: 10px;">Price Drop Alert!</h1>
+  <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
+    Great news! A fragrance you loved just dropped in price.
+  </p>
+  <p style="font-size: 16px; color: #666; line-height: 1.5; margin-bottom: 30px;">
+    It's your chance to grab it before it's gone. Stock is limited — don't miss out on this aromatic steal!
+  </p>
+
+  <div>
+    <h2 style="font-size: 20px; font-weight: bold; color: #333; margin-bottom: 20px;">Your Wishlist Pick</h2>
+    <div style="display: flex; align-items: flex-start; margin-top: 20px; border: 1px solid #ddd; border-radius: 10px; padding: 15px; background-color: #f9f9f9;">
+      <img src="https://api.iconperfumes.in{{ product_image_url }}" alt="{{ product_variant }}" style="width: 120px; height: 120px; margin-right: 20px; border-radius: 10px; object-fit: cover; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);">
+      <div style="flex: 1;">
+        <h3 style="text-align: start; font-size: 16px; color: #1f2937; margin: 0 0 10px;">{{ product_variant }}</h3>
+        <p style="text-align: start; font-size: 15px; color: #433224;">
+          ₹{{ price }}
+          <span style="text-decoration: line-through; color: #9ca3af; margin-left: 10px; font-size: 14px;">₹{{ variant_price }}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <a href="https://www.iconperfumes.in{{ product_slug }}" style="display: inline-block; background-color: #433224; color: #ffffff; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-size: 16px; font-weight: bold; margin-top: 20px;">
+    Shop Now
+  </a>
+</div>
+
+<p style="font-size: 16px; line-height: 1.5; color: #666; border-bottom: 1px dashed #666; padding-top: 10px; padding-bottom: 20px;"></p>
+
+<div style="font-size: 12px; color: #888; text-align: center; margin-top: 20px;">
+  <p>Need help? Contact us at <a href="mailto:info@iconperfumes.in" style="color: #ff6f61;">info@iconperfumes.in</a></p>
+</div>
+{% endblock %}

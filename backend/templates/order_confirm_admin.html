@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Order Notification</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <style>
+    @media (max-width: 600px) {
+      .container {
+        padding: 5vw;
+        border-radius: 3vw;
+      }
+    }
+  </style>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0;">
+  <div class="container" style="max-width: 600px; margin: 40px auto; background-color: #fff; border-radius: 20px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden;">
+    <!-- Header -->
+    <div style="background-color: #2b1e1b; text-align: center; padding: 40px;">
+      <img src="https://www.iconperfumes.in/static/images/icon_logo_white.png" alt="Icon Perfumes Logo" style="height: 51px; width: 132px; object-fit: contain; margin-bottom: 20px;">
+      <h1 style="color: white; font-size: 24px; margin: 0;">New Order Received</h1>
+    </div>
+
+    <!-- Greeting -->
+    <div style="text-align: center; padding: 20px; color: #000;">
+      <h2 style="color:#000; font-size:22px; margin:0;">Hi Admin,</h2>
+      <p style="font-size: 14px; color: #000; margin-bottom:20px;">A new order #{{order.order_number}} has just been placed on Icon Perfumes. Please process it as soon as possible.</p>
+      <a href="{{ admin_order_url }}" style="text-decoration:none; margin-top: 20px; padding: 10px 20px; background-color: #2b1e1b; color: #fff; border: none; border-radius: 5px; font-size: 14px; font-weight: bold; cursor: pointer;">VIEW ORDER IN ADMIN</a>
+    </div>
+
+    <!-- Order Details -->
+    <div style="padding: 10px; border-bottom: 1px dashed #ddd; margin: 0 20px;">
+      <h2 style="color:#000; font-size:20px; margin:0 0 10px;">🧾 Order Details:</h2>
+      {% for item in items %}
+      {% if item.variant.product.is_gift_card == False %}
+      <div style="display: flex; align-items: flex-start; border: 1px solid #ddd; border-radius: 10px; padding: 15px; background-color: #f9f9f9; margin-bottom: 10px;">
+        {% if item.variant.images.all %}
+        <img src="https://api.iconperfumes.in{{ item.variant.images.first.image.url }}" alt="Product image" style="width: 100px; height: 100px; margin-right: 20px; border-radius: 10px; object-fit: cover; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);">
+        {% endif %}
+        <div style="flex: 1;">
+          <h3 style="font-size: 16px; color: #1f2937; margin: 0 0 10px;">{{item.variant}}</h3>
+          <p style="font-size: 14px; color: #6b7280; margin: 5px 0;">Quantity: <b>{{item.quantity}}</b></p>
+          <p style="font-size: 14px; color: #2b1e1b; margin: 5px 0;">₹ {% widthratio item.discounted_price 1 item.quantity %}</p>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Price Breakup -->
+    <div style="padding: 20px; border-bottom: 1px dashed #ddd; margin: 0 20px;">
+      <h2 style="font-size: 18px; color: #1f2937;">Price Breakup</h2>
+      {% if order.discount %}
+      <div style="font-size: 14px; margin: 2px 0; overflow: hidden;">
+        <p style="color: #2b1e1b; float: left;">Original Price</p>
+        <p style="float: right;">₹ {% if order.final_price == "0.00" or order.final_price == 0.00 %}{{order.discount}} {% else %} {{order.sub_total|add:order.gst|floatformat:2}} {% endif %}</p>
+      </div>
+      <div style="font-size: 14px; margin: 2px 0; overflow: hidden;">
+        <p style="color: #2b1e1b; float: left;">Discount</p>
+        <p style="float: right;">₹ {{order.discount}}</p>
+      </div>
+      {% endif %}
+      <div style="font-size: 14px; margin: 2px 0; overflow: hidden;">
+        <p style="color: #2b1e1b; float: left;">Sub Total</p>
+        <p style="float: right;">₹ {{order.sub_total}}</p>
+      </div>
+      <div style="font-size: 14px; margin: 2px 0; overflow: hidden;">
+        <p style="color: #2b1e1b; float: left;">Shipping Charges</p>
+        <p style="float: right;">₹ {{order.shipping_charges}}</p>
+      </div>
+      {% comment %} <div style="font-size: 14px; margin: 2px 0; overflow: hidden;">
+        <p style="color: #2b1e1b; float: left;">Tax (Inc.)</p>
+        <p style="float: right;">₹ {{order.gst}}</p>
+      </div> {% endcomment %}
+      <div style="font-size: 14px; margin: 2px 0; overflow: hidden;">
+        <p style="color: #2b1e1b; float: left;">Total Amount</p>
+        <p style="float: right;">₹ {{order.final_price}}</p>
+      </div>
+      <hr />
+      <p style="font-size: 14px; color: #1f2937; margin: 0;">Shipping Address: <i class="fa-solid fa-location-dot"></i> {{order.address}}, {{order.city}}, {{order.state}}, {{order.pincode}}</p>
+    </div>
+
+    <!-- Footer -->
+    <div style="text-align: center; padding: 20px; font-size: 12px; color: #888;">
+      <p>&copy; 2025 Icon Perfumes. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
