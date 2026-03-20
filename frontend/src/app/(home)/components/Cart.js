@@ -32,7 +32,11 @@ const Cart = ({ open, close,recommend_products }) => {
 
   const handleCheckout = () => {
     dispatch(setCheckoutItems());
-    router.push("/checkout");
+    if (!cookies.get("is_logged_in")) {
+      router.push("/login?redirect=/checkout");
+    } else {
+      router.push("/checkout");
+    }
     close(false);
     dispatch(cartDrawer(false));
   };

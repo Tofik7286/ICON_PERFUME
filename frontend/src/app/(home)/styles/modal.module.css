@@ -89,7 +89,40 @@
   flex-direction: column;
   justify-content: center;
   gap: 0.4em;
+  position: relative;
 }
+
+.closeBtn {
+  border: 0;
+  background: transparent;
+  position: absolute;
+  top: -0.6em;
+  right: -0.3em;
+  color: #666;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: var(--text-color);
+}
+
+.changeEmailBtn {
+  border: 0;
+  background: transparent;
+  color: #666;
+  font-size: 0.95em;
+  margin-bottom: 0.2em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.changeEmailBtn:hover {
+  color: var(--accent2-color);
+}
+
 .content .content_icon {
   background-color: rgb(233, 245, 233);
   width: 2.2em;

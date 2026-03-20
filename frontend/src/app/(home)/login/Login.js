@@ -2,7 +2,6 @@
 import React from 'react'
 import styles from '@/app/(home)/styles/login.module.css'
 import Link from 'next/link'
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -23,7 +22,6 @@ import secureLocalStorage from 'react-secure-storage';
 const Login = () => {
 
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const [passwordVisible, setPasswordVisible] = useState(false);
     const url = process.env.NEXT_PUBLIC_API_URL
     const router = useRouter();
     const dispatch = useDispatch();
@@ -33,10 +31,6 @@ const Login = () => {
     const { wishList } = useSelector(selectWishList);
     const params = useSearchParams()
     const redirect = params.get("redirect") ? params.get("redirect") : "/"
-
-    const togglePasswordVisibility = () => {
-        setPasswordVisible(!passwordVisible);
-    };
 
     const onSubmit = async (data) => {
 
@@ -56,8 +50,7 @@ const Login = () => {
                 },
                 credentials:"include",
                 body: JSON.stringify({
-                    phone_number: data.contact,
-                    password: data.password,
+                    email: data.email,
                     cart_data: cart,
                     wishlist_data: wishList 
                 }),
@@ -72,21 +65,24 @@ const Login = () => {
                 dispatch(fetchUser());
                 dispatch(fetchCart());
                 dispatch(fetchWishList());
-                await router.push(redirect);
+                await router.push('/');
             };
 
-            if (json.success) {
-                await handleSuccessfulLogin(json.message);
-            } else if (json.verify === false) {
+            if (json.success && json.requires_otp) {
                 dispatch(loader(false));
-
-                dispatch(addToast({ message: json.message, type: 'warning' }));
+                dispatch(addToast({ message: json.message, type: 'success' }));
 
                 const modalPromise = new Promise((resolve) => {
                     const callbackId = registerModalCallback(resolve);
                     dispatch(openModal({
                         component: 'OTP',
-                        props: { email: json.email, masked_email: json.masked_email },
+                        props: {
+                            email: json.email,
+                            masked_email: json.masked_email,
+                            cart_data: cart,
+                            wishlist_data: wishList,
+                            flow: 'login',
+                        },
                         url: `${url}/verify-email/`,
                         callbackId,
                     }));
@@ -96,6 +92,8 @@ const Login = () => {
                 if (modalResponse.success) {
                     await handleSuccessfulLogin(modalResponse.message);
                 }
+            } else if (json.success) {
+                await handleSuccessfulLogin(json.message);
             } else {
                 setError(json.message);
 
@@ -117,52 +115,26 @@ const Login = () => {
                         <div className='heading !my-0'>
                             <h1 className='!w-full !font-[500]'>Welcome Back</h1>
                         </div>
-                        <p className={styles.para}>Access your personal account by logging in.</p>
+                        <p className={styles.para}>Enter your email and sign in with a verification code.</p>
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="input-field">
-                                <label htmlFor="email">Email Address Or Phone number</label>
+                                <label htmlFor="email">Email Address</label>
                                 <div className="input">
                                     <input
-                                        type="text"
-                                        placeholder="Enter your Email or Phone Number"
-                                        id="contact"
-                                        {...register('contact', {
-                                            required: 'Email or Phone Number is required',
-                                            validate: value => {
-                                                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                                const phonePattern = /^[0-9]{10}$/; // Adjust this for international numbers if needed
-                                                if (!emailPattern.test(value) && !phonePattern.test(value)) {
-                                                    return 'Enter a valid email or phone number';
-                                                }
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        id="email"
+                                        {...register('email', {
+                                            required: 'Email is required',
+                                            pattern: {
+                                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                                message: 'Enter a valid email address',
                                             },
                                         })}
                                     />
                                 </div>
-                                {errors.contact && (
-                                    <p className="text-red-500 text-xs">{errors.contact.message}</p>
-                                )}
-                            </div>
-
-                            {/* Password Field */}
-                            <div className="input-field">
-                                <label htmlFor="password">Password</label>
-                                <div className="input d-flex align-items-center">
-                                    <input
-                                        type={passwordVisible ? "text" : "password"}
-                                        placeholder="Enter your Password"
-                                        id="password"
-                                        {...register('password', {
-                                            required: 'Password is required',
-                                            minLength: {
-                                                value: 6,
-                                                message: 'Password must be at least 6 characters',
-                                            },
-                                        })}
-                                    />
-                                    {passwordVisible ? <FaRegEye onClick={togglePasswordVisibility} /> : <FaRegEyeSlash onClick={togglePasswordVisibility} />}
-                                </div>
-                                {errors.password && (
-                                    <p className="text-red-500 text-xs">{errors.password.message}</p>
+                                {errors.email && (
+                                    <p className="text-red-500 text-xs">{errors.email.message}</p>
                                 )}
                             </div>
                             <div className="d-flex justify-content-between align-items-center">
@@ -172,7 +144,7 @@ const Login = () => {
                             {Error && (
                                 <p className="text-red-500 text-xs">{Error}</p>
                             )}
-                            <button type='submit' className={`${styles.button} shine-button`}>Log In</button>
+                            <button type='submit' className={`${styles.button} shine-button`}>Send Code</button>
                         </form>
                         <p className={styles.para}>Don&apos;t have an account? <Link href={`/sign-up/?redirect=${redirect}`}>Sign up</Link></p>
                     </div>

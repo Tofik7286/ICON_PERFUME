@@ -55,7 +55,7 @@ GENDER_CHOICES = (
 
 # # Create custom model for user
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True)
     username = models.CharField(max_length=120, blank=True, null=True)
     email = models.EmailField(max_length=100, blank=True, null=True)
     date_joined = models.DateField(auto_now_add=True, null=True, blank=True)

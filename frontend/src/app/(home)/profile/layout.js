@@ -15,7 +15,6 @@ import { clearCheckout } from '../redux/checkoutSlice';
 import { useState } from 'react';
 import { GoPerson } from "react-icons/go";
 import { IoLocationOutline } from "react-icons/io5";
-import { RiLockPasswordLine } from "react-icons/ri";
 import { AiOutlineUserDelete } from "react-icons/ai";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { BiLogOutCircle } from "react-icons/bi";
@@ -118,10 +117,6 @@ export default function ProfileLayout({ children }) {
               <li className="mb-1 me-1">
                 <Link href="/profile/addresses" className={pathname === '/profile/addresses/' ? styles.active : ''}>
                   <IoLocationOutline /> Addresses</Link>
-              </li>
-              <li className="mb-1 me-1">
-                <Link href="/profile/change-password" className={pathname === '/profile/change-password/' ? styles.active : ''}>
-                  <RiLockPasswordLine /> Change Password</Link>
               </li>
               <li className="mb-1 me-1" onClick={handleConfirm} style={{ cursor: "pointer" }}>
                 <a><AiOutlineUserDelete /> Delete Your Account</a>

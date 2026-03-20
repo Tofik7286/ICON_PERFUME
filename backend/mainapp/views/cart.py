@@ -143,7 +143,14 @@ class UserCart(APIView):
 def plus_cart(request, id):
     try:
         user = request.user
-        cart = Cart.objects.get(id=id, user=user)
+        # Frontend sends ProductVariant.id for cart +/- actions.
+        # Keep a fallback to Cart.id for backward compatibility.
+        cart = Cart.objects.filter(user=user, variant_id=id).first()
+        if not cart:
+            cart = Cart.objects.filter(id=id, user=user).first()
+        if not cart:
+            return error_response('Cart item not found', status_code=status.HTTP_404_NOT_FOUND)
+
         if (cart.quantity + 1) > cart.variant.stock:
             title = cart.variant.product.title
             short_title = (title[:12] + '...') if len(title) > 12 else title
@@ -154,8 +161,6 @@ def plus_cart(request, id):
         cart.quantity += 1
         cart.save()
         return Response({'success': True, 'message': 'Cart updated'}, status=status.HTTP_200_OK)
-    except Cart.DoesNotExist:
-        return error_response('Cart item not found', status_code=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         logger.exception("Error in plus_cart")
         return error_response('Something went wrong. Please try again later.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

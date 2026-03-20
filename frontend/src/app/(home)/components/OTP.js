@@ -1,23 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from '@/app/(home)/styles/modal.module.css';
 import { HiMail } from "react-icons/hi";
 import { useSelector } from 'react-redux';
 import { closeModal, resolveModal, selectModal } from '../redux/modalSlice';
-import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { loader } from '../redux/loaderSlice';
 import { addToast } from '../redux/toastSlice';
-import Cookies from 'universal-cookie';
 
 const OTP = () => {
 
     const { modalProps, url } = useSelector(selectModal);
     const dispatch = useDispatch();
     const api_url = process.env.NEXT_PUBLIC_API_URL
-    const router = useRouter();
-    const cookies = new Cookies();
     const [Error, setError] = useState('');
+
+    const handleChangeEmail = () => {
+        setError('');
+        dispatch(closeModal());
+    }
+
+    const handleCloseModal = () => {
+        setError('');
+        dispatch(closeModal());
+    }
     
     const { register, handleSubmit, setValue, getValues, clearErrors, reset, formState: { errors } } = useForm({
         defaultValues: {
@@ -166,6 +172,12 @@ const OTP = () => {
 
     return (
         <div className={styles.content}>
+            <button type='button' className={styles.closeBtn} onClick={handleCloseModal} aria-label='Close OTP modal'>
+                X
+            </button>
+            <button type='button' className={styles.changeEmailBtn} onClick={handleChangeEmail}>
+                Change Email
+            </button>
             <div className={styles.content_icon}>
                 <HiMail />
             </div>

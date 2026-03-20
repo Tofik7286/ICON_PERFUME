@@ -17,10 +17,11 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.shortcuts import redirect 
 from rest_framework import status
-from datetime import timezone, timedelta
+from datetime import timedelta
 from django.conf import settings
 from datetime import datetime
 from django.db.models import Q
+from django.utils import timezone
 from .serializers import *
 from .models import *
 from mainapp.models import Cart , ProductVariant , Wishlist
@@ -46,7 +47,79 @@ OTP_HEADER = "Your Sign-in Code"
 OTP_SUBJECT = "Here is your verification code"
 
 # SEC-03: Whitelist of allowed fields for profile update
-ALLOWED_UPDATE_FIELDS = {'name', 'username', 'email', 'phone_number'}
+ALLOWED_UPDATE_FIELDS = {'name', 'email', 'phone_number'}
+
+
+def _parse_positive_int(value, default=1):
+    try:
+        parsed = int(value)
+        return parsed if parsed > 0 else default
+    except (TypeError, ValueError):
+        return default
+
+
+def merge_guest_cart_and_wishlist(user, cart_data=None, wishlist_data=None):
+    """Merge guest cart/wishlist into user account with stock-safe quantity handling."""
+    cart_data = cart_data or []
+    wishlist_data = wishlist_data or []
+
+    for item in cart_data:
+        variant_info = item.get('variant') if isinstance(item, dict) else None
+        variant_id = None
+
+        if isinstance(variant_info, dict):
+            variant_id = variant_info.get('id')
+        if variant_id is None and isinstance(item, dict):
+            variant_id = item.get('variant_id')
+
+        if not variant_id:
+            continue
+
+        quantity = _parse_positive_int(item.get('quantity') if isinstance(item, dict) else 1)
+        variant = ProductVariant.objects.filter(id=variant_id).first()
+        if not variant or variant.stock < 1:
+            continue
+
+        user_cart, created = Cart.objects.get_or_create(user=user, variant=variant)
+        merged_quantity = quantity if created else (user_cart.quantity + quantity)
+        merged_quantity = min(merged_quantity, variant.stock)
+        user_cart.quantity = merged_quantity
+        user_cart.save()
+
+    for item in wishlist_data:
+        variant_info = item.get('variant') if isinstance(item, dict) else None
+        variant_id = variant_info.get('id') if isinstance(variant_info, dict) else None
+        if not variant_id:
+            continue
+
+        variant = ProductVariant.objects.filter(id=variant_id).first()
+        if not variant:
+            continue
+
+        Wishlist.objects.get_or_create(user=user, variant=variant)
+
+
+def build_auth_cookies_response(response, access_token):
+    is_localhost = bool(settings.DEBUG)
+    response.set_cookie(
+        key="token",
+        value=str(access_token),
+        httponly=True,
+        secure=False if is_localhost else True,
+        samesite="Lax" if is_localhost else "None",
+        domain=None if is_localhost else os.environ.get('DOMAIN'),
+        expires=timezone.now() + timedelta(days=30)
+    )
+    response.set_cookie(
+        key="is_logged_in",
+        value="true",
+        httponly=False,
+        secure=False if is_localhost else True,
+        samesite="Lax" if is_localhost else "None",
+        domain=None if is_localhost else os.environ.get('DOMAIN'),
+        expires=timezone.now() + timedelta(days=30)
+    )
+    return response
 
 def hash_otp(otp):
     '''
@@ -57,43 +130,31 @@ def hash_otp(otp):
 @api_view(["POST"])
 def signup(request):
     try:
-        data = json.loads(request.body)  # Get all data from body
-        email =  data.get('email','')
-        name = data.get('name','')
-        password = data.get('password','')
-        phone_number = data.get('phone_number','')
+        data = json.loads(request.body)
+        email = str(data.get('email') or data.get('identifier') or data.get('contact') or '').strip().lower()
+        cart_data = data.get('cart_data') or []
+        wishlist_data = data.get('wishlist_data') or []
 
-        # Check if detail is empty or not
-        if not email or not password or not phone_number:
-            return error_response('Please provide all required fields', status_code=status.HTTP_400_BAD_REQUEST)
-        data = {'success':True}
+        if not email or '@' not in email:
+            return error_response('Please provide a valid email address', status_code=status.HTTP_400_BAD_REQUEST)
 
-        # Now Check user with email already exists or not
-        try:
-            email_exists = CustomUser.objects.get(email=email)
-            if email and email_exists:
-                return error_response('User with this email already exists', status_code=status.HTTP_409_CONFLICT)
-        except Exception as e:
-            pass
-        try:
-            phone_exists = CustomUser.objects.get(phone_number=phone_number)
-            if phone_number and phone_exists:
-                return error_response('User with this phone number already exists', status_code=status.HTTP_409_CONFLICT)
-        except Exception as e:
-            pass
+        existing_user = CustomUser.objects.filter(email=email).first()
+        if existing_user:
+            return error_response('Account already exists. Please login with email OTP.', status_code=status.HTTP_400_BAD_REQUEST)
 
-        # If not exists then create new user
-        user = CustomUser(email=email)
-        user.name = name
-        user.phone_number = phone_number
-        user.is_active = False
-        user.set_password(password)
+        user = CustomUser(
+            email=email,
+            phone_number=None,
+            is_active=False,
+        )
+        user.set_password(secrets.token_urlsafe(16))
         user.save()
 
-        # Generate otp
-        otp = str(random.randint(100000,999999))
-        otpObj, created = Otp.objects.update_or_create(user=user,otp=hash_otp(otp))
+        otp = str(random.randint(100000, 999999))
+        otpObj, _ = Otp.objects.get_or_create(user=user)
         otpObj.otp = hash_otp(otp)
+        otpObj.attempts = 0
+        otpObj.count = 1
         otpObj.save()
 
         email_html = render_to_string('emails/otp_email.html', {
@@ -107,13 +168,21 @@ def signup(request):
             html_message=email_html,
             message='',
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
+            recipient_list=[user.email],
         )
-        masked_email = get_masked_email(email)
-
+        masked_email = get_masked_email(user.email)
         return Response(
-            {"success": True, "message": f"OTP sent to {masked_email} email successfully.","email":email,"masked_email":masked_email},
-            status=status.HTTP_201_CREATED
+            {
+                "success": True,
+                "requires_otp": True,
+                "message": f"OTP sent to {masked_email} email successfully.",
+                "email": user.email,
+                "masked_email": masked_email,
+                "flow": "signup",
+                "cart_data": cart_data,
+                "wishlist_data": wishlist_data,
+            },
+            status=status.HTTP_200_OK
         )
     except Exception as e:
         logger.exception("Error in signup")
@@ -125,115 +194,55 @@ def signup(request):
 @api_view(["POST"])
 def user_login(request):
     try:
-    # Get Data now if method is correct
         data = json.loads(request.body)
-        identifier = str(data.get('phone_number'))
-        password = data.get('password')
-        if not identifier or not password:
-          return error_response('please enter phone number/email or password', status_code=status.HTTP_400_BAD_REQUEST)
-            
-        # Search user with email and password
-        if '@' in identifier:
-            user = CustomUser.objects.get(email=identifier)
-            if user and user.check_password(password):
-                pass
-            else:
-                user = None
-        else:
-            user = CustomUser.objects.get(phone_number=identifier)
-            if user and user.check_password(password):
-                pass
-            else:
-                user = None
-        
-        if user:
-            if user.is_active: # Logging in user with password 
-                refresh  = RefreshToken.for_user(user) 
-                cart_data = data.get('cart_data')
-                wishlist_data = data.get('wishlist_data')
-                if cart_data: 
-                  for item in cart_data :
-                      variant_id = item['variant'].get('id')
-                      quantity = item.get('quantity')
-                      variant = ProductVariant.objects.get(id=variant_id)
-              
-                      user_cart, created = Cart.objects.get_or_create(user=user,variant=variant)
-                      if created:
-                        user_cart.quantity =  int(quantity)
-                      else:
-                        user_cart.quantity += int(quantity)
-                      user_cart.save()
-        
+        email = str(data.get('email') or data.get('identifier') or data.get('contact') or '').strip().lower()
+        cart_data = data.get('cart_data') or []
+        wishlist_data = data.get('wishlist_data') or []
 
-                if wishlist_data:
-                    for item in wishlist_data:
-                      variant_id = item['variant'].get('id')
-                      variant = ProductVariant.objects.get(id=variant_id)
-                      user_wishlist, created = Wishlist.objects.get_or_create(user=user,variant=variant)
-                      user_wishlist.save()
-                
-                is_localhost = bool(settings.DEBUG)
+        if not email or '@' not in email:
+            return error_response('Please provide a valid email address', status_code=status.HTTP_400_BAD_REQUEST)
 
-                # SEC-11: Set httponly=True on JWT cookie
-                response = JsonResponse({'success':True,"message":"Login Successfully"})
-                response.set_cookie(
-                    key="token",
-                    value=str(refresh.access_token),
-                    httponly=True,
-                    secure=False if is_localhost else True,
-                    samesite="Lax" if is_localhost else "None",
-                    domain=None if is_localhost else os.environ.get('DOMAIN'),
-                    expires=timezone.now() + timedelta(days=30)
-                )
-                # Non-httpOnly flag so frontend JS can detect login state
-                response.set_cookie(
-                    key="is_logged_in",
-                    value="true",
-                    httponly=False,
-                    secure=False if is_localhost else True,
-                    samesite="Lax" if is_localhost else "None",
-                    domain=None if is_localhost else os.environ.get('DOMAIN'),
-                    expires=timezone.now() + timedelta(days=30)
-                )
-                # Clear stale checkout cookies on fresh login
-                response.delete_cookie('checkout_hashData')
-                response.delete_cookie('cart_data')
-                response.delete_cookie('buynow')
-                return response
-            else:
-                otp = str(random.randint(100000,999999))
-                try:
-                    otpObj = Otp.objects.get(user=user)
-                    otpObj.otp = hash_otp(otp)
-                    otpObj.save()
-                except Otp.DoesNotExist:
-                    otpObj = Otp.objects.create(user=user,otp=hash_otp(otp))
+        user = CustomUser.objects.get(email=email)
 
+        otp = str(random.randint(100000, 999999))
+        otpObj, _ = Otp.objects.get_or_create(user=user)
+        otpObj.otp = hash_otp(otp)
+        otpObj.attempts = 0
+        otpObj.count = 1 if otpObj.updated_at.date() < timezone.now().date() else (otpObj.count + 1)
+        otpObj.save()
 
-                email_html = render_to_string('emails/otp_email.html', {
-                    'header': 'Email Verification Code',
-                    'message': 'Please use the code below to verify your email address and complete your account setup:',
-                    'otp': otp,
-                    'current_year': current_year,
-                })
-                send_mail(
-                    subject="Your Sign-in Code",
-                    html_message=email_html,
-                    message='',
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[user.email],
-                ) 
-                
-                masked_email = get_masked_email(user.email)
-                message = f'OTP successfully sent to your Email {masked_email}'
-                return Response({'success':False,'verify':False,"message":'You Are Not Verified Please Verify Your Email','email':user.email,'masked_email':masked_email},status=status.HTTP_200_OK)
-        else:
-            # Authentication failed or password invalid
-            return error_response('phone number/email or password incorrect', status_code=status.HTTP_400_BAD_REQUEST)
+        email_html = render_to_string('emails/otp_email.html', {
+            'header': 'Your Sign-in Code',
+            'message': 'Please use the code below to sign in to your account:',
+            'otp': otp,
+            'current_year': current_year,
+        })
+        send_mail(
+            subject=OTP_SUBJECT,
+            html_message=email_html,
+            message='',
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+        )
+
+        masked_email = get_masked_email(user.email)
+        return Response(
+            {
+                'success': True,
+                'requires_otp': True,
+                'message': f'OTP sent to {masked_email} email successfully.',
+                'email': user.email,
+                'masked_email': masked_email,
+                'flow': 'login',
+                'cart_data': cart_data,
+                'wishlist_data': wishlist_data,
+            },
+            status=status.HTTP_200_OK,
+        )
     except json.JSONDecodeError:
         return error_response('Invalid request format', status_code=status.HTTP_400_BAD_REQUEST)
     except CustomUser.DoesNotExist:
-        return error_response('User with this email/phone number does not exists', status_code=status.HTTP_404_NOT_FOUND)
+        return error_response('No account found with this email. Please sign up first.', status_code=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         logger.exception("Error in user_login")
         return error_response('Something went wrong. Please try again later.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -268,6 +277,8 @@ def verify_otp(request):
         if hash_otp(str(otp)) != otpObj.otp or not otpObj.is_valid:
             return error_response('Invalid or expired OTP.', status_code=status.HTTP_400_BAD_REQUEST)
 
+        was_new_user = bool(user.is_new)
+
         # Activate user account
         user.is_active = True
         user.save()
@@ -275,27 +286,7 @@ def verify_otp(request):
         if data.get('data'):
           wishlist_data = data['data'].get('wishlist_data')
           cart_data = data['data'].get('cart_data')
-
-          if cart_data:
-            for item in cart_data :
-                variant_id = item['variant'].get('id')
-                quantity = item.get('quantity')
-
-                variant = ProductVariant.objects.get(id=variant_id)
-                
-                user_cart, created = Cart.objects.get_or_create(user=user,variant=variant)
-                if created:
-                    user_cart.quantity = int(quantity)
-                else:
-                    user_cart.quantity += int(quantity)
-                user_cart.save()
-          
-          if wishlist_data:
-              for item in wishlist_data:
-                  variant_id = item['variant'].get('id')
-                  variant = ProductVariant.objects.get(id=variant_id)
-                  user_wishlist, created = Wishlist.objects.get_or_create(user=user,variant=variant)
-                  user_wishlist.save()
+          merge_guest_cart_and_wishlist(user, cart_data=cart_data, wishlist_data=wishlist_data)
               
         # Clear OTP from cache
         otpObj.delete()
@@ -316,28 +307,12 @@ def verify_otp(request):
         user.save()
         refresh = RefreshToken.for_user(user)   
         token = str(refresh.access_token)
-        response = JsonResponse({"success": True, "message": "Email verified successfully."},status=status.HTTP_200_OK)
-        is_localhost = bool(settings.DEBUG)
-        # SEC-11: Set httponly=True on JWT cookie
-        response.set_cookie(
-            key="token",
-            value=token,
-            httponly=True,
-            secure=False if is_localhost is True else True,
-            samesite="Lax" if is_localhost is True else "None",
-            domain= None if is_localhost is True else os.environ.get("DOMAIN"),
-            expires=timezone.now() + timedelta(days=30)
-        )
-        # Non-httpOnly flag so frontend JS can detect login state
-        response.set_cookie(
-            key="is_logged_in",
-            value="true",
-            httponly=False,
-            secure=False if is_localhost is True else True,
-            samesite="Lax" if is_localhost is True else "None",
-            domain= None if is_localhost is True else os.environ.get("DOMAIN"),
-            expires=timezone.now() + timedelta(days=30)
-        )
+        response = JsonResponse({
+            "success": True,
+            "message": "Email verified successfully.",
+            "profile_redirect": was_new_user,
+        },status=status.HTTP_200_OK)
+        response = build_auth_cookies_response(response, token)
         # Clear stale checkout cookies on fresh login
         response.delete_cookie('checkout_hashData')
         response.delete_cookie('cart_data')
@@ -706,17 +681,17 @@ class UserProfile(APIView):
           if not user.name:
               user.name = ''
 
-          if not user.username:
-              user.username = ''
-
           if not user.email:
               user.email = ''
 
+          phone_number = user.phone_number
+          if phone_number and str(phone_number).startswith('tmp'):
+              phone_number = ''
+
           data = {
               "success":True,
-              "phone_number":str( user.phone_number),
+              "phone_number":str(phone_number or ''),
               "email":str(user.email),
-              "username":str(user.username),
               "name":str(user.name),
           }
           return Response(data ,status=status.HTTP_200_OK)
@@ -732,62 +707,41 @@ class UserProfile(APIView):
           if user is None:
               return error_response('User not found', status_code=status.HTTP_404_NOT_FOUND)
           data = json.loads(request.body)
+          changed_fields = []
           # Check for valid email and update
-          email = data.get('email')
-          updated = False
-          if email:
-              email_exists = CustomUser.objects.filter(email=email).exclude(id=user.id).exists()
-              if not email_exists:
-                  user.email = email
-                  updated = True
-              else:
-                  return error_response('User with this email already exists!', status_code=status.HTTP_400_BAD_REQUEST)
+          if 'email' in data:
+              email = str(data.get('email') or '').strip().lower()
+              email_value = email if email else None
+              if email_value:
+                  email_exists = CustomUser.objects.filter(email=email_value).exclude(id=user.id).exists()
+                  if email_exists:
+                      return error_response('User with this email already exists!', status_code=status.HTTP_400_BAD_REQUEST)
+              if user.email != email_value:
+                  user.email = email_value
+                  changed_fields.append('email')
+
+          if 'phone_number' in data:
+              phone_number = str(data.get('phone_number') or '').strip()
+              phone_value = phone_number if phone_number else None
+              if phone_value:
+                  phone_number_exists = CustomUser.objects.filter(phone_number=phone_value).exclude(id=user.id).exists()
+                  if phone_number_exists:
+                      return error_response('User with this Phone Number already exists!', status_code=status.HTTP_400_BAD_REQUEST)
+              if user.phone_number != phone_value:
+                  user.phone_number = phone_value
+                  changed_fields.append('phone_number')
               
-          phone_number = data.get('phone_number')
-          if phone_number:
-              phone_number_exists = CustomUser.objects.filter(phone_number=phone_number).exclude(id=user.id).exists()
-              if not phone_number_exists:
-                  user.phone_number = phone_number
-                  updated = True
-              else:
-                  return error_response('User with this Phone Number already exists!', status_code=status.HTTP_400_BAD_REQUEST)
-              
-          
-          # Check for valid username and update
-          name = data.get('name')
-          username = data.get('username')
-          if username:
-              user.username = username
-          if updated:
-              user.is_active = False
-              otp = str(random.randint(100000,999999))
-              otpObj ,created = Otp.objects.get_or_create(user=user, defaults={'otp':hash_otp(otp)})
-              otpObj.otp = hash_otp(otp)
-              otpObj.attempts = 0  # SEC-07: Reset attempts when new OTP is sent
-              otpObj.save()
-              html_content = render_to_string('emails/otp_email.html', {
-                  'header': 'Please Verify Email',
-                  'message': 'Please enter this confirmation code to complete your account setup:',
-                  'otp': otp,
-                  'current_year': current_year,
-              })
-              send_mail(
-                  subject=OTP_SUBJECT,
-                  message="",
-                  html_message=html_content,
-                  from_email=settings.DEFAULT_FROM_EMAIL,
-                  recipient_list=[email],
-              )
-              updated_data = {
-                  'name':name,
-                  'username':username,
-                  'email':email,
-                  'phone_number':phone_number,
-              }
-              data = {'success':True,"message":"Please verify your email to update your profile.",'masked_email':get_masked_email(email)}
-              return Response(data,status=status.HTTP_200_OK)    
-          else:
-              return error_response('Something went wrong', status_code=status.HTTP_400_BAD_REQUEST)
+          if 'name' in data:
+              name = str(data.get('name') or '').strip()
+              if user.name != name:
+                  user.name = name
+                  changed_fields.append('name')
+
+          if not changed_fields:
+              return error_response('No changes found to update', status_code=status.HTTP_400_BAD_REQUEST)
+
+          user.save(update_fields=list(set(changed_fields)))
+          return Response({'success':True, 'message':'Profile updated successfully'}, status=status.HTTP_200_OK)
             
         def delete(self,request):
             try:
