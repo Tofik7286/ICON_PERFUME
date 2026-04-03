@@ -246,7 +246,7 @@ const Cart = ({ open, close,recommend_products }) => {
   <div className={styles.recommend_products}>
     {recommend_products?.map((item, index) => {
       const imageSrc = item?.images?.[0]?.image
-        ? `http://localhost:8000/${item.images[0].image}`
+        ? `${process.env.NEXT_PUBLIC_BACKEND_URL || ""}${item.images[0].image}`
         : "/images/no_product.svg"; // fallback image
 
       return (
