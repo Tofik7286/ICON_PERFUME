@@ -193,16 +193,34 @@ TEST_PAYMENTS_API_KEY = os.environ.get('TEST_PAYMENTS_API_KEY')
 #     'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'icon_perfumes_local',
-        'USER': 'icon_perfumes',
-        'PASSWORD': 'icon',  # Use the password you set in Step 1
-        'HOST': 'localhost',
-        'PORT': '5432',
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'icon_perfumes_local',
+#         'USER': 'icon_perfumes',
+#         'PASSWORD': 'icon',  # Use the password you set in Step 1
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES = {
+    "default": dj_database_url.parse(DATABASE_URL)
     }
-}
+else:
+    DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME", "icon_perfumes_local"),
+        "USER": os.getenv("DB_USER", "icon_perfumes"),
+        "PASSWORD": os.getenv("DB_PASSWORD", "icon"),
+        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+        }
+    }
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
