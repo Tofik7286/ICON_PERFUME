@@ -1,61 +1,201 @@
 # ==========================================
-# Icon Perfumes - Master GitIgnore
+
+# 🚀 Icon Perfumes - Production GitIgnore
+
 # ==========================================
 
-# --- Django Specific ---
+# ------------------------------------------
+
+# 🔐 Environment & Secrets (CRITICAL)
+
+# ------------------------------------------
+
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+*.der
+
+# AWS / Cloud credentials
+
+.aws/
+.aws-config/
+.aws/credentials
+.aws/config
+
+# SSH Keys
+
+id_rsa
+id_rsa.pub
+*.pem
+
+# ------------------------------------------
+
+# 🐍 Django / Python
+
+# ------------------------------------------
+
 *.log
-local_settings.py
+*.pot
+*.pyc
+*.pyo
+*.pyd
+**pycache**/
+*$py.class
+
 db.sqlite3
 db.sqlite3-journal
 backend/tempdb.sqlite3
-__pycache__/
-*.py[cod]
-*$py.class
 
-# --- Media & Static (CRITICAL) ---
-# Inko server par hi rehne dena chahiye, GitHub par nahi
+# Django local settings
+
+local_settings.py
+
+# Virtual environments
+
+.venv/
+venv/
+env/
+ENV/
+
+# ------------------------------------------
+
+# 📦 Media & Static (DO NOT PUSH)
+
+# ------------------------------------------
+
 media/
 media/*
 backend/media/
 backend/staticfiles/
 backend/static_root/
+staticfiles/
 
-# --- Environment & Secrets ---
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.venv
-venv/
-env/
-ENV/
-certs/
+# ------------------------------------------
 
-# --- Next.js / Frontend ---
-frontend/node_modules/
+# ⚙️ Node / Frontend
+
+# ------------------------------------------
+
 node_modules/
-frontend/.next/
-frontend/out/
-frontend/build/
+frontend/node_modules/
+
 .next/
+frontend/.next/
+
 out/
 build/
+frontend/build/
 
-# --- OS Specific ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ------------------------------------------
+
+# 🐳 Docker (if used)
+
+# ------------------------------------------
+
+docker-compose.override.yml
+*.tar
+
+# ------------------------------------------
+
+# 🧠 Cache / Temp
+
+# ------------------------------------------
+
+.cache/
+*.tmp
+*.temp
+tmp/
+
+# ------------------------------------------
+
+# 🖥️ System Files
+
+# ------------------------------------------
+
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# --- IDEs ---
-.idea/
+# ------------------------------------------
+
+# 💻 IDE / Editor
+
+# ------------------------------------------
+
 .vscode/
+.idea/
 *.swp
 *.swo
 
-# --- Packaging/Distribution ---
+# ------------------------------------------
+
+# 📦 Packaging
+
+# ------------------------------------------
+
 dist/
 build/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# ------------------------------------------
+
+# 📊 Logs
+
+# ------------------------------------------
+
+logs/
+*.log
+
+# ------------------------------------------
+
+# 🧪 Testing / Coverage
+
+# ------------------------------------------
+
+.coverage
+htmlcov/
+.pytest_cache/
+
+# ------------------------------------------
+
+# 🔥 PM2 (IMPORTANT for EC2)
+
+# ------------------------------------------
+
+.pm2/
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ------------------------------------------
+
+# ⚡ Nginx / Server
+
+# ------------------------------------------
+
+nginx.conf
+*.conf.local
+
+# ------------------------------------------
+
+# 🔒 Misc Security
+
+# ------------------------------------------
+
+secrets.json
+config/secrets.yml
+*.bak
+*.old
