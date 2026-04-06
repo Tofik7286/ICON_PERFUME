@@ -7,7 +7,6 @@ const nextConfig = {
       "localhost",
       "3.109.240.161",
       "www.iconperfumes.in",
-      "www.hidelifestyle.au",
       "api.iconperfumes.in",
       "www.test4.wardah.in",
       "api.test4.wardah.in",
