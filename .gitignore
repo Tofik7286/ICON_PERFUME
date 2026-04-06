@@ -33,7 +33,10 @@
 id_rsa
 id_rsa.pub
 *.pem
-
+# Extra safety
+*.backup
+*.sql
+*.dump
 # ------------------------------------------
 
 # 🐍 Django / Python

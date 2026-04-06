@@ -1,17 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      "127.0.0.1",
-      "localhost",
-      "www.iconperfumes.in",
-      "www.hidelifestyle.au",
-      "api.iconperfumes.in",
-      "www.test4.wardah.in",
-      "api.test4.wardah.in",
-      "api.iconperfumes.in",
-    ], // Add your hostname here
-  },
+  domains: [
+    "127.0.0.1",
+    "localhost",
+    "3.109.240.161",
+    "www.iconperfumes.in",
+    "www.hidelifestyle.au",
+    "api.iconperfumes.in",
+    "www.test4.wardah.in",
+    "api.test4.wardah.in",
+    "api.iconperfumes.in",
+  ],
+},
   env: {
     API_URL: process.env.NEXT_PUBLIC_API_URL,
     IMAGE_URL: process.env.IMAGE_URL,
