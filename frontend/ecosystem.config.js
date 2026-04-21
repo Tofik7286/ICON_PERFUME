@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
       {
-        name: 'hidelifestyle-uk',
+        name: 'icon-perfumes-frontend',
         script: 'npm',
         args: 'start',
         env: {

@@ -26,7 +26,7 @@ from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html, mark_safe
 from import_export import fields, resources
-from import_export.admin import (ExportMixin, ImportExportModelAdmin,
+from import_export.admin import (ExportActionMixin, ExportMixin, ImportExportModelAdmin,
                                  ImportMixin)
 from import_export.formats.base_formats import CSV, XLSX
 from django_summernote.admin import SummernoteModelAdmin
@@ -1704,6 +1704,33 @@ class NewsLetterAdmin(ExportMixin, admin.ModelAdmin):
         return super().has_module_permission(request)
 
 
+class NotesResource(resources.ModelResource):
+    class Meta:
+        model = Notes
+        fields = ("title", "type", "description")
+        export_order = ("title", "type", "description")
+
+
+class NotesAdmin(ExportActionMixin, admin.ModelAdmin):
+    list_display = ["title", "type"]
+    list_filter = ["type"]
+    search_fields = ["title", "description"]
+    resource_class = NotesResource
+
+    def get_export_formats(self):
+        return [CSV]
+
+    def has_view_permission(self, request, obj=None):
+        if request.user.is_staff:
+            return True
+        return super().has_view_permission(request, obj)
+
+    def has_module_permission(self, request):
+        if request.user.is_staff:
+            return True
+        return super().has_module_permission(request)
+
+
 class ContactAdmin(admin.ModelAdmin):
     list_display = ["id", "email", "subject",'submitted_at']
     list_filter = ["subject"]
@@ -1805,7 +1832,7 @@ admin_site.register(NewsLetter, NewsLetterAdmin)
 admin_site.register(ProductCategory, ProductCategoryAdmin)
 admin_site.register(ReturnExchange, ReturnExchangeAdmin)
 admin_site.register(ProductSeries, ProductSeriesAdmin)
-admin_site.register(Notes)
+admin_site.register(Notes, NotesAdmin)
 
 
 class CheckoutSessionAdmin(admin.ModelAdmin):

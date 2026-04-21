@@ -4,16 +4,38 @@ import urllib3
 from pathlib import Path
 from dotenv import load_dotenv
 from datetime import timedelta
-import dj_database_url  # For parsing DATABASE_URL
-from urllib.parse import quote_plus
-from distutils.util import strtobool
+from urllib.parse import quote_plus, unquote, urlparse
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')
+DJANGO_ENV = os.getenv('DJANGO_ENV', 'local').strip().lower()
+ENV_FILE = BASE_DIR / ('.env.production' if DJANGO_ENV == 'production' else '.env.local')
 
-DEBUG = bool(strtobool(os.getenv("DEBUG", "True")))
+if not ENV_FILE.exists():
+    ENV_FILE = BASE_DIR / '.env'
+
+load_dotenv(ENV_FILE)
+
+def to_bool(value, default=True):
+    if value is None:
+        return default
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+DEBUG = to_bool(os.getenv("DEBUG", "True"))
+
+
+def parse_database_url(database_url):
+    parsed = urlparse(database_url)
+    return {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": parsed.path.lstrip("/"),
+        "USER": unquote(parsed.username or ""),
+        "PASSWORD": unquote(parsed.password or ""),
+        "HOST": parsed.hostname or "127.0.0.1",
+        "PORT": str(parsed.port or "5432"),
+    }
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
@@ -208,7 +230,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
     DATABASES = {
-    "default": dj_database_url.parse(DATABASE_URL)
+    "default": parse_database_url(DATABASE_URL)
     }
 else:
     DATABASES = {
@@ -260,6 +282,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = os.environ.get('MEDIA_URL')
 MEDIA_ROOT = BASE_DIR / 'media'
 
+LOG_DIR = BASE_DIR / 'logs'
+DEFAULT_LOG_FILE = LOG_DIR / 'admin.log'
+DEFAULT_ERROR_LOG_FILE = LOG_DIR / 'error.log'
+LOG_FILE_PATH = os.getenv('LOG_FILE_PATH', str(DEFAULT_LOG_FILE))
+ERROR_LOG_FILE = os.getenv('ERROR_LOG_FILE', str(DEFAULT_ERROR_LOG_FILE))
+
+# Ensure file handler directories exist even when env vars are missing.
+Path(LOG_FILE_PATH).parent.mkdir(parents=True, exist_ok=True)
+Path(ERROR_LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
+
 SUMMERNOTE_CONFIG = {
     'iframe': True,  # Ensure content is isolated
     'summernote': {
@@ -294,7 +326,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': os.environ.get('LOG_FILE_PATH'),  
+            'filename': LOG_FILE_PATH,
             'formatter':'verbose',
         },
         'console':{
@@ -305,7 +337,7 @@ LOGGING = {
         'error_handler':{
             'level': 'INFO',
             'class':'logging.FileHandler',
-            'filename': os.environ.get('ERROR_LOG_FILE'),  
+            'filename': ERROR_LOG_FILE,
             'formatter':'simple'
         }
     },
@@ -375,29 +407,26 @@ GDAL_LIBRARY_PATH = '/usr/local/opt/gdal/lib/libgdal.dylib'  # Update with the a
 #     }
 
 # Redis Configurations
-if DEBUG == False:
-    REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
+REDIS_DB = os.getenv("REDIS_DB", "1")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "")
 
-    CACHES = {
-        "default":{
-            "BACKEND":"django_redis.cache.RedisCache",
-            "LOCATION":f"redis://:{REDIS_PASSWORD}@127.0.0.1:6379/1",
-            "OPTIONS":{
-                "CLIENT_CLASS":"django_redis.client.DefaultClient"
-            }
-        }
-    }
+if REDIS_PASSWORD:
+    REDIS_URL = f"redis://:{quote_plus(REDIS_PASSWORD)}@{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
 else:
-    CACHES = {
-        "default":{
-            "BACKEND":"django_redis.cache.RedisCache",
-            "LOCATION":"redis://127.0.0.1:6379/1",
-            "OPTIONS":{
-                "CLIENT_CLASS":"django_redis.client.DefaultClient"
-            }
+    REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
         }
     }
+}
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
-CELERY_BROKER_URL = 'amqp://localhost' # RabbitMQ
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://localhost')  # RabbitMQ
