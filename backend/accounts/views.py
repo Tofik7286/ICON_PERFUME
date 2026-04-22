@@ -83,13 +83,23 @@ def _sanitize_cookie_domain(raw_domain):
 
 
 def _cookie_scope():
-    is_localhost = bool(settings.DEBUG)
-    if is_localhost:
-        return {
-            'secure': False,
-            'samesite': 'Lax',
-            'domain': None,
-        }
+    def _env_bool(name, default=None):
+        value = os.environ.get(name)
+        if value is None:
+            return default
+        return str(value).strip().lower() in {'1', 'true', 'yes', 'on'}
+
+    # Allow explicit override from env for emergency production toggles.
+    forced_secure = _env_bool('AUTH_COOKIE_SECURE', default=None)
+
+    web_url = str(getattr(settings, 'WEB_URL', '') or '').strip().lower()
+    web_url_is_https = web_url.startswith('https://')
+
+    # Default behavior:
+    # - local/debug or non-https deployments: host-only cookies with Lax
+    # - https deployments: cross-site compatible cookies (Secure + SameSite=None)
+    should_secure = forced_secure if forced_secure is not None else (not settings.DEBUG and web_url_is_https)
+    same_site = 'None' if should_secure else 'Lax'
 
     raw_domain = (
         os.environ.get('AUTH_COOKIE_DOMAIN')
@@ -100,8 +110,8 @@ def _cookie_scope():
     domain = _sanitize_cookie_domain(raw_domain)
 
     return {
-        'secure': True,
-        'samesite': 'None',
+        'secure': should_secure,
+        'samesite': same_site,
         'domain': domain,
     }
 
