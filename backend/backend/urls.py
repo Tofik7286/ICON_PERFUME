@@ -2,8 +2,6 @@ from django.contrib import admin
 from mainapp.admin import admin_site
 from mainapp.views import *
 from django.urls import path,include, re_path
-from django.conf.urls.static import static
-from django.conf import settings
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -21,4 +19,3 @@ urlpatterns = [
     re_path(r'^invoices/(?P<path>.*)$', views.serve_invoices, name='serve_invoices')
 
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
