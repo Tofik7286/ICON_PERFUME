@@ -4,6 +4,8 @@ import json
 import traceback
 import logging
 import secrets
+import ipaddress
+from urllib.parse import urlparse
 
 from django.http import JsonResponse
 import jwt
@@ -48,6 +50,74 @@ OTP_SUBJECT = "Here is your verification code"
 
 # SEC-03: Whitelist of allowed fields for profile update
 ALLOWED_UPDATE_FIELDS = {'name', 'email', 'phone_number'}
+
+
+def _sanitize_cookie_domain(raw_domain):
+    """Return a valid cookie domain or None when domain should be host-only."""
+    if not raw_domain:
+        return None
+
+    domain = str(raw_domain).strip()
+    if not domain:
+        return None
+
+    # Accept values like https://example.com, example.com/, :443 and normalize.
+    if '://' in domain:
+        parsed = urlparse(domain)
+        domain = parsed.hostname or ''
+
+    domain = domain.split('/')[0].split(':')[0].strip().lstrip('.')
+
+    if not domain or domain.lower() in {'localhost', '127.0.0.1'}:
+        return None
+
+    # Domain attribute should not be set for IP hosts; use host-only cookies instead.
+    try:
+        ipaddress.ip_address(domain)
+        return None
+    except ValueError:
+        pass
+
+    # Browsers accept both "example.com" and ".example.com". Keep explicit shared form.
+    return f".{domain}"
+
+
+def _cookie_scope():
+    is_localhost = bool(settings.DEBUG)
+    if is_localhost:
+        return {
+            'secure': False,
+            'samesite': 'Lax',
+            'domain': None,
+        }
+
+    raw_domain = (
+        os.environ.get('AUTH_COOKIE_DOMAIN')
+        or os.environ.get('COOKIE_DOMAIN')
+        or os.environ.get('DOMAIN')
+        or settings.WEB_URL
+    )
+    domain = _sanitize_cookie_domain(raw_domain)
+
+    return {
+        'secure': True,
+        'samesite': 'None',
+        'domain': domain,
+    }
+
+
+def _delete_auth_cookies(response):
+    scope = _cookie_scope()
+    domain = scope.get('domain')
+
+    for key in ('token', 'is_logged_in', 'sessionid', 'csrftoken'):
+        # Clear host-only cookie.
+        response.delete_cookie(key=key)
+        # Clear shared-domain cookie when configured.
+        if domain:
+            response.delete_cookie(key=key, domain=domain)
+
+    return response
 
 
 def _parse_positive_int(value, default=1):
@@ -100,24 +170,25 @@ def merge_guest_cart_and_wishlist(user, cart_data=None, wishlist_data=None):
 
 
 def build_auth_cookies_response(response, access_token):
-    is_localhost = bool(settings.DEBUG)
+    scope = _cookie_scope()
+    cookie_kwargs = {
+        'secure': scope['secure'],
+        'samesite': scope['samesite'],
+        'domain': scope['domain'],
+        'expires': timezone.now() + timedelta(days=30),
+    }
+
     response.set_cookie(
         key="token",
         value=str(access_token),
         httponly=True,
-        secure=False if is_localhost else True,
-        samesite="Lax" if is_localhost else "None",
-        domain=None if is_localhost else os.environ.get('DOMAIN'),
-        expires=timezone.now() + timedelta(days=30)
+        **cookie_kwargs,
     )
     response.set_cookie(
         key="is_logged_in",
         value="true",
         httponly=False,
-        secure=False if is_localhost else True,
-        samesite="Lax" if is_localhost else "None",
-        domain=None if is_localhost else os.environ.get('DOMAIN'),
-        expires=timezone.now() + timedelta(days=30)
+        **cookie_kwargs,
     )
     return response
 
@@ -749,14 +820,8 @@ class UserProfile(APIView):
                 if user is not None:
                     logout(request)
                     user.delete()
-                    is_localhost = bool(settings.DEBUG)
-                    domain = None if is_localhost else os.environ.get('DOMAIN')
                     response = Response({'success':True,'message':'User deleted successfully'},status=status.HTTP_200_OK)
-                    response.delete_cookie(key='token', domain=domain)
-                    response.delete_cookie(key='is_logged_in', domain=domain)
-                    response.delete_cookie(key='sessionid', domain=domain)
-                    response.delete_cookie(key='csrftoken', domain=domain)
-                    return response
+                    return _delete_auth_cookies(response)
             except:
                 return error_response('Authentication failed', status_code=status.HTTP_400_BAD_REQUEST)
             
@@ -824,16 +889,8 @@ def getAllUsers(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def logout_account(request):
-    is_localhost = bool(settings.DEBUG)
-    domain = None if is_localhost else os.environ.get('DOMAIN')
-    
     # Invalidate Django session
     logout(request)
     
     response = JsonResponse({'success':True, 'message':"Logged out Successfully"})
-    response.delete_cookie(key='token', domain=domain)
-    response.delete_cookie(key='is_logged_in', domain=domain)
-    response.delete_cookie(key='sessionid', domain=domain)
-    response.delete_cookie(key='csrftoken', domain=domain)
-
-    return response
+    return _delete_auth_cookies(response)
