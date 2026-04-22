@@ -5,11 +5,12 @@ const nextConfig = {
     domains: [
       "127.0.0.1",
       "localhost",
-      "3.109.240.161",
+      "13.232.103.131",
       "www.iconperfumes.in",
       "api.iconperfumes.in",
       "www.test4.wardah.in",
       "api.test4.wardah.in",
+
     ],
   },
   env: {

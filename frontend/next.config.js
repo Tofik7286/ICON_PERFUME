@@ -10,6 +10,7 @@ const nextConfig = {
       "api.iconperfumes.in",
       "www.test4.wardah.in",
       "api.test4.wardah.in",
+      "13.232.103.131",
     ],
   },
 };
