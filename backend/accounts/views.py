@@ -92,13 +92,10 @@ def _cookie_scope():
     # Allow explicit override from env for emergency production toggles.
     forced_secure = _env_bool('AUTH_COOKIE_SECURE', default=None)
 
-    web_url = str(getattr(settings, 'WEB_URL', '') or '').strip().lower()
-    web_url_is_https = web_url.startswith('https://')
-
     # Default behavior:
     # - local/debug or non-https deployments: host-only cookies with Lax
     # - https deployments: cross-site compatible cookies (Secure + SameSite=None)
-    should_secure = forced_secure if forced_secure is not None else (not settings.DEBUG and web_url_is_https)
+    should_secure = forced_secure if forced_secure is not None else not settings.DEBUG
     same_site = 'None' if should_secure else 'Lax'
 
     raw_domain = (
@@ -114,6 +111,25 @@ def _cookie_scope():
         'samesite': same_site,
         'domain': domain,
     }
+
+
+def _request_is_secure(request):
+    if request is None:
+        return False
+
+    forwarded_proto = str(request.META.get('HTTP_X_FORWARDED_PROTO', '')).split(',')[0].strip().lower()
+    if forwarded_proto:
+        return forwarded_proto == 'https'
+
+    return bool(request.is_secure())
+
+
+def _cookie_scope_for_request(request=None):
+    scope = _cookie_scope()
+    if not _request_is_secure(request):
+        scope['secure'] = False
+        scope['samesite'] = 'Lax'
+    return scope
 
 
 def _delete_auth_cookies(response):
@@ -179,8 +195,8 @@ def merge_guest_cart_and_wishlist(user, cart_data=None, wishlist_data=None):
         Wishlist.objects.get_or_create(user=user, variant=variant)
 
 
-def build_auth_cookies_response(response, access_token):
-    scope = _cookie_scope()
+def build_auth_cookies_response(response, access_token, request=None):
+    scope = _cookie_scope_for_request(request)
     cookie_kwargs = {
         'secure': scope['secure'],
         'samesite': scope['samesite'],
@@ -393,7 +409,7 @@ def verify_otp(request):
             "message": "Email verified successfully.",
             "profile_redirect": was_new_user,
         },status=status.HTTP_200_OK)
-        response = build_auth_cookies_response(response, token)
+        response = build_auth_cookies_response(response, token, request=request)
         # Clear stale checkout cookies on fresh login
         response.delete_cookie('checkout_hashData')
         response.delete_cookie('cart_data')
