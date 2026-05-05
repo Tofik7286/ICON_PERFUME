@@ -131,16 +131,19 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'backend.urls'
 
 
-CORS_ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '').split(',') if os.environ.get('ALLOWED_ORIGINS') else []
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('ALLOWED_ORIGINS', '').split(',')
+    if origin.strip()
+]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'content-type',
     'accept',
     'authorization',
     'x-csrftoken',
-    # 'Upgrade-Insecure-Requests',  # Add this line
+    'x-requested-with',
 ]
-
 # Allow all methods (GET, POST, OPTIONS, etc.)
 CORS_ALLOW_METHODS = [
     'GET',
