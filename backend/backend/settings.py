@@ -130,12 +130,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'backend.urls'
 
-
 CORS_ALLOWED_ORIGINS = [
     origin.strip()
-    for origin in os.environ.get('ALLOWED_ORIGINS', '').split(',')
+    for origin in os.environ.get('ALLOWED_ORIGINS','').split(',')
     if origin.strip()
 ]
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     'content-type',
