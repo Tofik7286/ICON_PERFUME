@@ -28,7 +28,7 @@ import { addToast } from '../redux/toastSlice';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { MdOutlineLocalShipping } from 'react-icons/md';
 
-const Navbar1 = ({categories}) => {
+const Navbar1 = ({ categories = [] }) => {
 
   const [menu, setMenu] = useState(false);
   const [cartSlider, setCartSlider] = useState(false);

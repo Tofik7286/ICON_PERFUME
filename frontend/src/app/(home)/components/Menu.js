@@ -15,7 +15,7 @@ import { FiChevronDown } from "react-icons/fi";
 import { GiSquareBottle } from "react-icons/gi";
 import Image from 'next/image';
 
-const Menu = ({ menu, setMenu, categoryTree }) => {
+const Menu = ({ menu, setMenu, categoryTree = [] }) => {
 
     const { user, status, error } = useSelector(selectUser);
     const [expanded, setExpanded] = useState(null);

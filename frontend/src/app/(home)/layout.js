@@ -60,7 +60,7 @@ export const metadata = {
 };
 
 export default async function HomeLayout({ children }) {
-  const {categories} = await fetchCategories();
+  const categories = await fetchCategories();
   const products = await fetchBestSellers();
   
   return (
