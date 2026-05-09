@@ -25,23 +25,12 @@ const nextConfig = {
   
   // Limit on-demand entries cache to prevent memory bloat
   onDemandEntries: {
-    maxInactiveAge: 60 * 1000, // 60 seconds
-    pagesBufferLength: 5, // Keep only 5 pages in buffer
-  },
-  
-  // Disable static optimization if causing cache issues
-  outputFileTracing: true,
-  
-  // Memory optimization for build
-  experimental: {
-    isrMemoryCacheSize: 0, // Disable ISR memory cache - use filesystem instead
+    maxInactiveAge: 60 * 1000, // 60 seconds - removes inactive pages from cache
+    pagesBufferLength: 5, // Keep only 5 pages in buffer instead of unlimited
   },
   
   // Compress build output
   compress: true,
-  
-  // Reduce build size
-  swcMinify: true,
 };
 
 module.exports = nextConfig;
