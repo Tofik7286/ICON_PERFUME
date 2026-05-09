@@ -15,7 +15,33 @@ const nextConfig = {
       "66.116.232.36:4019",
       "66.116.232.36"
     ],
+    // Optimize image caching to reduce memory footprint
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    minimumCacheTTL: 31536000, // 1 year
+    dangerouslyAllowSVG: false,
   },
+  
+  // Limit on-demand entries cache to prevent memory bloat
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000, // 60 seconds
+    pagesBufferLength: 5, // Keep only 5 pages in buffer
+  },
+  
+  // Disable static optimization if causing cache issues
+  outputFileTracing: true,
+  
+  // Memory optimization for build
+  experimental: {
+    isrMemoryCacheSize: 0, // Disable ISR memory cache - use filesystem instead
+  },
+  
+  // Compress build output
+  compress: true,
+  
+  // Reduce build size
+  swcMinify: true,
 };
 
 module.exports = nextConfig;
