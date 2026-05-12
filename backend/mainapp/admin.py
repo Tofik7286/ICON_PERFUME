@@ -41,7 +41,6 @@ from import_export.fields import Field
 from django.template.loader import render_to_string
 
 from .models import *
-from .views.shiprocket import *
 from .serializers import ProductVariantSerializer
 
 from django.contrib import messages
@@ -801,12 +800,8 @@ class OrderResource(resources.ModelResource):
             "payment_status",
             "payment_method",
             "is_new",
-            "awb_code",
-            "pickup_status",
             "edd",
             "transaction_id",
-            "manifest",
-            "lable",
             "invoice",
             "created_at",
             "updated_at",
@@ -968,7 +963,6 @@ class TransactionResource(resources.ModelResource):
         )
 
 
-import razorpay
 from .views.utils import *
 class TransactionAdmin(ExportMixin, admin.ModelAdmin):
     list_display = [
@@ -993,63 +987,6 @@ class TransactionAdmin(ExportMixin, admin.ModelAdmin):
                 return True
         return super().has_view_permission(request, obj)
     
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('<int:transaction_id>/refund/', self.admin_site.admin_view(self.refund_confirmation), name='transaction_refund'),
-            path('<int:transaction_id>/refund/confirm/', self.admin_site.admin_view(self.process_refund), name='transaction_process_refund'),
-        ]
-        return custom_urls + urls
-
-    # Confirmation page view
-    def refund_confirmation(self, request, transaction_id):
-        transaction = get_object_or_404(Transaction, id=transaction_id)
-        context = {
-            'transaction': transaction,
-            'title': 'Confirm Refund',
-            'opts': self.model._meta,
-            'original': transaction,
-            'refund_url': reverse('admin:transaction_process_refund',args=[transaction_id]),
-        }
-        return render(request, 'admin/transaction_refund_confirmation.html', context)
-
-    def process_refund(self, request, transaction_id):
-        transaction = get_object_or_404(Transaction, id=transaction_id)
-        client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_SECRET_KEY))
-        try:
-            refund_data = {'amount': int(transaction.amount * 100)}
-            refund = client.payment.refund(transaction.payment_id, refund_data)
-            transaction.transaction_status = "Refunded"
-            transaction.description = "This Transaction is Refunded to the Payer Due to some reasons"
-            transaction.refund_id = refund['id']
-            transaction.refund_by = request.user
-            transaction.save()
-            messages.success(request, f"Refund Successful: {refund['id']}")
-        except razorpay.errors.BadRequestError as e:
-            messages.error(request, f"Refund Failed: {str(e)}")
-        except Exception as e:
-            messages.error(request, f"Unexpected Error: {str(e)}")
-        
-        # Redirect back to transaction detail page
-        return redirect('admin:mainapp_transaction_change', transaction_id)
-
-
-    # Add Refund button to object-tools only on detail page
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        if extra_context is None:
-            extra_context = {}
-        # Get the transaction object
-        transaction = get_object_or_404(Transaction, id=object_id)
-        
-        # Only show the refund button if the transaction is not already refunded
-        if transaction.transaction_status != 'Refunded':
-            extra_context['show_refund_button'] = True
-            extra_context['refund_url'] = reverse('admin:transaction_refund', args=[object_id])
-        else:
-            extra_context['show_refund_button'] = False
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
-
-
 class CustomAdminSite(admin.AdminSite):
     def get_urls(self):
         # Get the default admin URLs and add our custom URL
@@ -1790,12 +1727,7 @@ class ReturnExchangeAdmin(admin.ModelAdmin):
 
     def approve_request(self, request, queryset):
         updated = queryset.update(status='APPROVED', processed_at=timezone.now())
-        self.message_user(request, f"{updated} request(s) approved.")
-        for return_exchange in queryset:
-            if return_exchange.request_type == "Return":
-                create_return_order_shiprocket(request, return_exchange.order_item.order.id,return_exchange.order_item.id, return_exchange.id)
-            else:
-                create_exchange_order_shiprocket(request, return_exchange.id, return_exchange.order_item.id)
+        self.message_user(request, f"{updated} request(s) approved. Create return/exchange shipments manually with your current courier process.")
     approve_request.short_description = "Approve selected requests"
 
     def reject_request(self, request, queryset):

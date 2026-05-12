@@ -33,7 +33,6 @@ urlpatterns = [
     path('order_change/', order_change, name='order_change'),
     path('calculate-total/',calculate_checkout_total,name='calculate_checkout_total'),
     path('order_check/', order_check, name='order_check'),
-    path("create-razorpay-order/",PaymentOrderAPIView.as_view(),name='create_razorpay_order'),
     path("initiate-payment/",PaymentOrderAPIView.as_view(),name='initiate-payment'),
     path("verify-payment/",VerifyPaymentAPIView.as_view(),name="verify_payment"),
     path('subscribe-news-letter/', subscribe_news_letter, name='subscribe-news-letter'),

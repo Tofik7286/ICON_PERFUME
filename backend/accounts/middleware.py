@@ -1,3 +1,7 @@
+from django.http import HttpResponsePermanentRedirect
+from django.conf import settings
+
+
 class JWTAuthenticationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
@@ -7,14 +11,11 @@ class JWTAuthenticationMiddleware:
             '/api/login/',
             '/api/signup/',
             '/api/verify-email/',
-            # '/api/verify-profile-otp/',
             '/api/send-otp/',
             '/api/forgot-password/',
-            '/api/reset-password/',  # token-based, so match prefix
-            # '/api/change-password/',
-
+            '/api/reset-password/',
             '/api/products/',
-            '/api/product/',  # detail view with slug/sku, so match prefix
+            '/api/product/',
             '/api/banners/',
             '/api/categories/',
             '/api/contact/',
@@ -25,7 +26,8 @@ class JWTAuthenticationMiddleware:
             '/api/buy-now-session/',
             '/api/admin/logs/',
         ]
-        excluded_prefixes = ['/admin/', '/static/', '/logs/','/api/product/']
+
+        excluded_prefixes = ['/admin/', '/static/', '/logs/', '/api/product/']
 
         if (
             request.path
@@ -35,5 +37,30 @@ class JWTAuthenticationMiddleware:
             token = request.COOKIES.get("token")
             if token:
                 request.META["HTTP_AUTHORIZATION"] = f"Bearer {token}"
+
+        return self.get_response(request)
+
+
+class PrependWwwMiddleware:
+    """
+    Redirect iconperfumes.in -> www.iconperfumes.in
+    ONLY IN PRODUCTION
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+
+        # LOCAL DEVELOPMENT => no redirect
+        if settings.DEBUG:
+            return self.get_response(request)
+
+        host = request.get_host().split(':')[0]
+
+        if host == "iconperfumes.in":
+            return HttpResponsePermanentRedirect(
+                "https://www.iconperfumes.in" + request.get_full_path()
+            )
 
         return self.get_response(request)

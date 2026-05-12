@@ -6,4 +6,3 @@ from .products import *
 from .reviews import *
 from .utils import *
 from .wishlist import *
-from .shiprocket import *

@@ -39,19 +39,29 @@ def parse_database_url(database_url):
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', default='').split(',')
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.environ.get('ALLOWED_HOSTS', '').split(',')
+    if h.strip()
+]
 
-SHIPROCKET_EMAIL = os.environ.get('SHIPROCKET_EMAIL')
+if not ALLOWED_HOSTS:
+    ALLOWED_HOSTS = [
+        "127.0.0.1",
+        "localhost",
+        "www.iconperfumes.in",
+        "iconperfumes.in",
+    ]
+# # Security settings — ensure HTTPS and secure cookies (override via env vars)
+# SECURE_SSL_REDIRECT = to_bool(os.environ.get('SECURE_SSL_REDIRECT', 'True'))
+# SESSION_COOKIE_SECURE = to_bool(os.environ.get('SESSION_COOKIE_SECURE', 'True'))
+# CSRF_COOKIE_SECURE = to_bool(os.environ.get('CSRF_COOKIE_SECURE', 'True'))
 
+
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 WEB_URL = os.environ.get("WEB_URL")
-
-SHIPROCKET_PASSWORD = os.environ.get('SHIPROCKET_PASSWORD')
-
-RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID')
-
-RAZORPAY_SECRET_KEY = os.environ.get('RAZORPAY_SECRET_KEY')
-
-PICKUP_POSTCODE = os.environ.get('PICKUP_POSTCODE')
 
 PAYU_MERCHANT_KEY = os.environ.get('PAYU_MERCHANT_KEY')
 
@@ -116,6 +126,7 @@ JAZZMIN_SETTINGS = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'accounts.middleware.PrependWwwMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

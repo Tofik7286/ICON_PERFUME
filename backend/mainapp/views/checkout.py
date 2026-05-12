@@ -21,10 +21,19 @@ from accounts.models import *
 from mainapp.serializers import *
 from mainapp.models import *
 from mainapp.views.utils import *
-from mainapp.views.shiprocket import *
 from mainapp.responses import success_response, error_response
 
 logger = logging.getLogger(__name__)
+DEFAULT_SHIPPING_CHARGE = Decimal("45")
+FREE_SHIPPING_MINIMUM = Decimal("499")
+
+
+def get_local_shipping_info(charge=DEFAULT_SHIPPING_CHARGE):
+    return {
+        "company_id": None,
+        "company_name": "Standard Delivery",
+        "company_rate": float(charge),
+    }
 
 def generate_transaction_id():
     """Generate a random 12-character alphanumeric transaction ID."""
@@ -118,13 +127,6 @@ def calculate_checkout_total(request):
         original_price = 0
         discount_amount = 0
         user = request.user
-        pickup_postcode = settings.PICKUP_POSTCODE
-        pincode = data.get("pincode")
-        payment_method = data.get("paymentMethod")
-        shipping_charge=0
-        shiprocket_info={}
-        cod = 0 if payment_method=="ONLINE" else 1
-
         # Authenticated users: ONLY trust DB data, ignore any cookie/frontend prices
         if user.is_authenticated and source == 'cart':
             data.pop('cart_data', None)  # PAYLOAD DEBUG: Strip cart_data from request for authenticated users
@@ -148,42 +150,6 @@ def calculate_checkout_total(request):
                 buynow_session.delete()
                 return error_response('Session expired. Please try again.', status_code=status.HTTP_410_GONE)
 
-        if pincode:
-            if source == 'cart':
-                # DB is the ONLY source of truth for cart — never trust frontend prices
-                db_cart_items = Cart.objects.filter(user=user).select_related('variant', 'variant__product')
-                
-                # ZERO-TRUST LOGIC: Empty cart = 200 OK with total=0 + auto-sync trigger
-                if not db_cart_items.exists():
-                    return Response({
-                        'success': True,
-                        'message': 'Cart is out of sync. Please refresh.',
-                        'sync_required': True,  # AUTO-SYNC TRIGGER: Tell frontend to call fetchCart()
-                        'amount': {
-                            'original_price': '0.00',
-                            'shipping': {},
-                            'sub_total': '0.00',
-                            'tax': '0.00',
-                            'tax_rate': 0,
-                            'discount': '0.00',
-                            'total': '0.00',
-                        }
-                    }, status=status.HTTP_200_OK)
-                variants = [
-                    {'variant': {'id': item.variant_id}, 'quantity': item.quantity}
-                    for item in db_cart_items
-                ]
-            else:
-                # buynow: use session data from DB
-                variants = [
-                    {'variant': {'id': buynow_session.variant_id}, 'quantity': buynow_session.quantity}
-                ]
-           
-            shiprocket_info = get_minimum_courier_rate(pickup_postcode, pincode, cod, variants)
-            if shiprocket_info is None:
-                shiprocket_info = {"company_rate": 45}
-
-            shipping_charge = 45
         # Calculate original price based on source
         outof_stock_products = []
         if source == 'cart':
@@ -294,17 +260,17 @@ def calculate_checkout_total(request):
         # Calculate final amounts
         vat_amount = original_price - subtotal
         total_ex_ship = float(original_price) - float(discount_amount)
-        if total_ex_ship >= 499:
-            shipping_charge = 0
-            shiprocket_info['company_rate'] = 0
+        if total_ex_ship >= float(FREE_SHIPPING_MINIMUM):
+            shipping_charge = Decimal("0")
+            shipping_info = get_local_shipping_info(shipping_charge)
         else:
-            shipping_charge = 45
-            shiprocket_info['company_rate'] = 45
+            shipping_charge = DEFAULT_SHIPPING_CHARGE
+            shipping_info = get_local_shipping_info(shipping_charge)
         
         # SEC-05: Fixed — Use is_staff/is_superuser instead of hardcoded user IDs
         if request.user.is_staff or request.user.is_superuser:
-            shipping_charge = 0
-            shiprocket_info['company_rate'] = 0
+            shipping_charge = Decimal("0")
+            shipping_info = get_local_shipping_info(shipping_charge)
 
         total_amount = float(original_price) + float(shipping_charge) - float(discount_amount)
         # Prepare response 
@@ -313,7 +279,7 @@ def calculate_checkout_total(request):
             'sync_required': False,  # AUTO-SYNC TRIGGER: Flag to indicate if frontend needs to refresh cart
             'amount': {
                 'original_price': "{:.2f}".format(original_price),
-                'shipping':shiprocket_info,
+                'shipping':shipping_info,
                 'sub_total': "{:.2f}".format(subtotal),
                 'tax': "{:.2f}".format(vat_amount),
                 'tax_rate': round(vat_rate * 100),

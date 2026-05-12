@@ -88,7 +88,7 @@ Backend ke liye `.env` file create karo jisme ye values honi chahiye:
 - URLs (web, media)
 - Logging file paths
 - Email config (optional)
-- Payment gateway keys (Razorpay, PayU, etc.)
+- Payment gateway keys (PayU, etc.)
 - Redis password (optional)
 
 ⚠️ Logging file paths dena mandatory hai, warna backend start nahi hoga.

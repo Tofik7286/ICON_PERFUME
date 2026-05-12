@@ -1393,13 +1393,13 @@
                             "raw": "{\n    \"paymentMethod\": \"ONLINE\",\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"9876543210\",\n    \"address\": \"123 Main Street\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"country\": \"India\",\n    \"pincode\": \"400001\",\n    \"amount\": {\n        \"discount\": \"0.00\"\n    },\n    \"shipping\": {\n        \"company_id\": \"1\",\n        \"company_name\": \"Delhivery\",\n        \"company_rate\": 45\n    },\n    \"promo\": null\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/create-razorpay-order/?source=cart",
+                            "raw": "{{base_url}}/api/initiate-payment/?source=cart",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "create-razorpay-order",
+                                "initiate-payment",
                                 ""
                             ],
                             "query": [

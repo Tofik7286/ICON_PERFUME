@@ -65,10 +65,6 @@ export default async function HomeLayout({ children }) {
   
   return (
     <html lang="en">
-      {/* <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="afterInteractive" // or 'lazyOnload'
-      /> */}
       <body className={`${inter.variable} ${bricolage.variable}`}>
         <ClientProvider>
           <TrackingScript/>

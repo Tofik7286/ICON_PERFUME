@@ -299,7 +299,6 @@ class Order(models.Model):
     )
 
     address = models.CharField(max_length=255,null=True,blank=True)
-    awb_code = models.CharField(max_length=50, blank=True, null=True) 
     city = models.CharField(max_length=100,null=True,blank=True)
     country=models.CharField(max_length=100,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -310,27 +309,19 @@ class Order(models.Model):
     gst=models.DecimalField(max_digits=10, decimal_places=2,null=True)
     invoice = models.FileField(upload_to='invoices', null=True, blank=True)
     is_new = models.BooleanField(default=True)
-    label = models.FileField(upload_to='labels', null=True, blank=True)
-    manifest = models.FileField(upload_to='manifests', null=True, blank=True)
     name = models.CharField(max_length=255, blank=True,null=True)
     order_date = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     order_number = models.CharField(max_length=200,null=True,blank=True)
     order_status = models.CharField(max_length=30,choices=ORDER_STATUS,default="Confirmed")
     phone_number = models.CharField(max_length=15,null=True,blank=True)
     pincode = models.CharField(max_length=10,null=True,blank=True)
-    pickup_schedule_date = models.CharField(max_length=50, blank=True, null=True)
-    pickup_token_number = models.CharField(max_length=50, blank=True, null=True)
     payment_status = models.CharField(choices=PAYMENT_STATUS,max_length=40,default='Pending')
     payment_method = models.CharField(choices=PAYMENT_METHOD,max_length=20, default="COD")
-    pickup_status = models.CharField(max_length=50, blank=True, null=True) 
     state = models.CharField(max_length=100,null=True,blank=True)
     sub_total = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_charges = models.DecimalField(max_digits=10, decimal_places=2,null=True)
     courier_company_id = models.CharField(max_length=255, null=True, blank=True)
     courier_company = models.CharField(max_length=255, null=True, blank=True)
-    shiprocket_order_id = models.CharField(max_length=50, blank=True, null=True)
-    shiprocket_invoice = models.FileField(upload_to='shiprocket_invoice', null=True, blank=True)
-    shipment_id = models.CharField(max_length=50, blank=True, null=True)
     tracking_link = models.URLField(blank=True, null=True)
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -461,16 +452,6 @@ class ContactUs(models.Model):
     def __str__(self):
         return f" {self.name} - {self.subject}"
 
-class ShiprocketToken(models.Model):
-    token = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def is_valid(self):
-        """Check if token is still valid (within 9 days)"""
-        now = timezone.now()
-        return (now - self.created_at).days < 9  # Valid for 9 days
-    
-
 class ReturnExchange(models.Model):
     REQUEST_TYPE_CHIOCE = [
         ('Return','Return'),
@@ -488,15 +469,6 @@ class ReturnExchange(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES,default='PENDING')
     processed_at = models.DateTimeField(null=True,blank=True)
     admin_note = models.TextField(blank=True)
-    awb_code = models.CharField(max_length=50, blank=True, null=True) 
-    shiprocket_order_id = models.CharField(max_length=50, blank=True, null=True)
-    shipment_id = models.CharField(max_length=50, blank=True, null=True)
-    pickup_status = models.CharField(max_length=50, blank=True, null=True) 
-    pickup_schedule_date = models.CharField(max_length=50, blank=True, null=True)
-    pickup_token_number = models.CharField(max_length=50, blank=True, null=True)
-    manifest = models.FileField(upload_to='manifests', null=True, blank=True)
-    label = models.FileField(upload_to='labels', null=True, blank=True)
-    shiprocket_invoice = models.FileField(upload_to='shiprocket_invoice', null=True, blank=True)
     tracking_link = models.URLField(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

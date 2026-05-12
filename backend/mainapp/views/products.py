@@ -15,7 +15,6 @@ from accounts.utils import append_log
 from accounts.models import *
 from mainapp.serializers import *
 from mainapp.models import *
-from mainapp.views.shiprocket import *
 import logging
 logger = logging.getLogger(__name__)
 
