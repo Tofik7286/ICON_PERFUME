@@ -5,11 +5,13 @@ import logging
 import uuid
 import string
 import random
+from hashlib import sha256
 
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 from django.conf import settings
+from django.core.cache import cache
 from django.db import transaction as db_transaction
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view , permission_classes, APIView
@@ -522,6 +524,8 @@ class PaymentOrderAPIView(APIView):
             )
 
     def post(self, request):
+        payment_method = None
+        initiation_lock_key = None
         try:
             data = request.data
             source = request.query_params.get('source')
@@ -532,6 +536,24 @@ class PaymentOrderAPIView(APIView):
             
             user = request.user
             payment_method = data.get('paymentMethod', 'COD')
+
+            if payment_method == 'ONLINE':
+                amount_data = data.get('amount', {}) or {}
+                lock_fingerprint = "|".join([
+                    str(source or ''),
+                    str(getattr(user, 'id', '') if user.is_authenticated else 'guest'),
+                    str(data.get('email', '')).strip().lower(),
+                    str(data.get('phone', '')).strip(),
+                    str(amount_data.get('total', '')),
+                ])
+                initiation_lock_key = f"payu:initiate:{sha256(lock_fingerprint.encode('utf-8')).hexdigest()}"
+
+                # Stop accidental double-clicks/retries from creating multiple PayU requests.
+                if not cache.add(initiation_lock_key, '1', timeout=65):
+                    return Response({
+                        "success": False,
+                        "message": "Payment request already started. Please wait 60 seconds and try again."
+                    }, status=status.HTTP_429_TOO_MANY_REQUESTS)
 
             # First create order
             order, error = self._create_order(user, data, payment_method, source)
@@ -592,5 +614,7 @@ class PaymentOrderAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
 
         except Exception as e:
+            if payment_method == 'ONLINE' and initiation_lock_key:
+                cache.delete(initiation_lock_key)
             logger.exception("Error in PaymentOrderAPIView")
             return Response({"success":False, "message": "Something went wrong. Please try again later."}, status=status.HTTP_400_BAD_REQUEST)

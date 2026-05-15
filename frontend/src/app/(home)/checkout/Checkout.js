@@ -50,6 +50,7 @@ const Checkout = () => {
   const [promoCode, setPromoCode] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [error, setError] = useState(null);
+  const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
   const [country, setCountry] = useState("+91");
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [discount_type, setDiscount_type] = useState(null);
@@ -473,7 +474,12 @@ const Checkout = () => {
   }
 
   const onSubmit = async (data) => {
+    if (isSubmittingPayment) {
+      return;
+    }
+
     try {
+      setIsSubmittingPayment(true);
       const checkoutData = {
         ...data,
         source,
@@ -555,6 +561,7 @@ const Checkout = () => {
         })
       );
     } finally {
+      setIsSubmittingPayment(false);
       dispatch(loader(false));
     }
   };
@@ -1063,8 +1070,11 @@ const Checkout = () => {
                   <button
                     type="submit"
                     className={`${styles.pay} ${Cart.btn} shine-button mb-4 mt-4`}
+                    disabled={isSubmittingPayment}
                   >
-                    {paymentMethodType === "ONLINE"
+                    {isSubmittingPayment
+                      ? "Processing..."
+                      : paymentMethodType === "ONLINE"
                       ? `Pay Now \u20B9${amount.total}`
                       : `Buy Now \u20B9${amount.total}`}
                   </button>
