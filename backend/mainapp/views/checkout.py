@@ -68,10 +68,16 @@ class VerifyPaymentAPIView(APIView):
         try:
             data = request.data
             payu_txnid = data.get("txnid")
-            
+            logger.info("payu.callback_verify txnid=%s", payu_txnid)
+
             # Verify payment
             response = self._verify_payment(data)
-            if response.get('status') != 1:
+            gateway_status = response.get('status')
+            logger.info(
+                "payu.verify_result txnid=%s gateway_status=%s",
+                payu_txnid, gateway_status,
+            )
+            if gateway_status != 1:
                 return Response({"success": False, "message": "Payment failed ❌"}, status=400)
             
             # Find transaction and order
@@ -83,28 +89,88 @@ class VerifyPaymentAPIView(APIView):
                     'data': []
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-            # Check if order already processed
+            # Fast-path idempotency for double callbacks.
             if transaction.order.payment_status == "Paid":
                 return Response({
                     'success': False,
                     'message': 'Order already processed',
                     'order_id': transaction.order.id
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
-            # Update order and transaction status
-            transaction.order.payment_status = "Paid"
-            transaction.order.save()
-            
-            transaction.transaction_status = "Paid"
-            transaction.save()
-            
-            # Generate invoice
-            generate_invoice(transaction.order.email, transaction.order.order_number)
-            
+
+            payment_session = PaymentSession.objects.filter(txnid=payu_txnid).first()
+
+            with db_transaction.atomic():
+                order = Order.objects.select_for_update().get(id=transaction.order_id)
+
+                # Re-check inside the lock to close the double-callback race.
+                if order.payment_status == "Paid":
+                    logger.info(
+                        "payu.double_callback_ignored txnid=%s order_id=%s",
+                        payu_txnid, order.id,
+                    )
+                    return Response({
+                        'success': False,
+                        'message': 'Order already processed',
+                        'order_id': order.id
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+                order_items = list(
+                    OrderItem.objects.filter(order=order).select_related('variant')
+                )
+
+                # Lock + validate stock now that payment is confirmed.
+                locked_variants = {}
+                for oi in order_items:
+                    if oi.variant_id is None:
+                        continue
+                    v = ProductVariant.objects.select_for_update().get(id=oi.variant_id)
+                    locked_variants[oi.id] = v
+                    if not v.stock or v.stock < oi.quantity:
+                        if payment_session:
+                            payment_session.mark('FAILED')
+                        logger.warning(
+                            "payu.oversell_block txnid=%s order_id=%s variant_id=%s need=%s have=%s",
+                            payu_txnid, order.id, v.id, oi.quantity, v.stock,
+                        )
+                        return Response({
+                            'success': False,
+                            'message': 'Payment received but an item is out of stock. A refund will be initiated.',
+                            'order_id': order.id,
+                        }, status=status.HTTP_409_CONFLICT)
+
+                # Decrement stock exactly once, post-payment.
+                for oi in order_items:
+                    v = locked_variants.get(oi.id)
+                    if v is None:
+                        continue
+                    v.stock -= oi.quantity
+                    v.save()
+                logger.info(
+                    "payu.stock_decremented txnid=%s order_id=%s",
+                    payu_txnid, order.id,
+                )
+
+                order.payment_status = "Paid"
+                order.save()
+
+                transaction.transaction_status = "Paid"
+                transaction.save()
+
+                if payment_session:
+                    payment_session.mark('SUCCESS')
+
+                if payment_session and payment_session.checkout_session_id:
+                    CheckoutSession.objects.filter(
+                        id=payment_session.checkout_session_id
+                    ).delete()
+
+            # Generate invoice (outside the lock; external/slow work).
+            generate_invoice(order.email, order.order_number)
+
             return Response({
                 'success': True,
                 'message': 'Payment verified successfully',
-                'order_id': transaction.order.id
+                'order_id': order.id
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
@@ -378,9 +444,11 @@ class PaymentOrderAPIView(APIView):
             if not variant.stock or variant.stock < int(quantity):
                 return None, f'{variant} is out of stock'
 
-            # Decrement stock
-            variant.stock -= int(quantity)
-            variant.save()
+            # COD decrements now; ONLINE defers stock until payment is
+            # verified (VerifyPaymentAPIView) to prevent orphan stock locks.
+            if payment_method != 'ONLINE':
+                variant.stock -= int(quantity)
+                variant.save()
 
             # Calculate prices
             original_price = variant.discounted_price * quantity
@@ -433,9 +501,11 @@ class PaymentOrderAPIView(APIView):
                 order_item.promotion = promotion
                 order_item.save()
 
-            # Clean up checkout session after order creation
-            session.delete()
-            
+            # COD: clean up the session now. ONLINE: keep it until payment is
+            # verified (deleted in VerifyPaymentAPIView on success).
+            if payment_method != 'ONLINE':
+                session.delete()
+
             return order, None
 
     def _create_cart_order(self, user, data, payment_method, promotion, transaction_id):
@@ -448,11 +518,13 @@ class PaymentOrderAPIView(APIView):
                 if not variant.stock or variant.stock < item.quantity:
                     return None, f'{variant} is out of stock'
 
-            # Decrement stock for all items
-            for item in cart_items:
-                variant = ProductVariant.objects.select_for_update().get(id=item.variant_id)
-                variant.stock -= item.quantity
-                variant.save()
+            # COD decrements now; ONLINE defers stock until payment is
+            # verified (VerifyPaymentAPIView) to prevent orphan stock locks.
+            if payment_method != 'ONLINE':
+                for item in cart_items:
+                    variant = ProductVariant.objects.select_for_update().get(id=item.variant_id)
+                    variant.stock -= item.quantity
+                    variant.save()
 
             # Calculate prices
             original_price = sum((item.variant.discounted_price * item.quantity for item in cart_items))
@@ -523,98 +595,174 @@ class PaymentOrderAPIView(APIView):
                 default=False
             )
 
+    def _finalize_order_number(self, user, order, data):
+        """Assign order number + save address (authenticated) or guest tag."""
+        if user.is_authenticated:
+            order.order_number = self._create_order_number(user, order.id)
+            order.save()
+            self._save_address(user, data)
+        else:
+            order.order_number = f"GUEST{order.id}"
+            order.save()
+
+    def _build_payu_payload(self, order):
+        """Build the PayU payload + hash for an order (stable per txnid)."""
+        key = settings.PAYU_MERCHANT_KEY
+        salt = settings.PAYU_MERCHANT_SALT
+        # Normalize amount to PayU's canonical 2-decimal form so the hashed
+        # amount matches the posted amount (avoids hash mismatch).
+        amount_str = format(order.final_price, ".2f")
+        hash_str = f"{key}|{order.transaction_id}|{amount_str}|Order Payment|{order.name}|{order.email}|||||||||||{salt}"
+        hashh = hashlib.sha512(hash_str.encode('utf-8')).hexdigest().lower()
+        payu_payload = {
+            "key": key,
+            "txnid": order.transaction_id,
+            "amount": amount_str,
+            "productinfo": "Order Payment",
+            "firstname": order.name,
+            "email": order.email,
+            "phone": order.phone_number,
+            "surl": f"{settings.WEB_URL}{settings.PAYU_SUCCESS_URL}?txnid={order.transaction_id}&hash={hashh}&status=success",
+            "furl": f"{settings.WEB_URL}{settings.PAYU_FAILURE_URL}?status=failed",
+            "hash": hashh,
+        }
+        return payu_payload, hashh
+
+    def _payment_response(self, user, order):
+        """Build PayU response; ensure exactly one Transaction per txnid."""
+        payu_payload, hashh = self._build_payu_payload(order)
+        Transaction.objects.get_or_create(
+            transaction_id=order.transaction_id,
+            defaults={
+                'user': user,
+                'name': order.name,
+                'amount': str(order.final_price),
+                'phone_number': order.phone_number,
+                'token': hashh,
+                'order': order,
+            },
+        )
+        return Response({
+            "success": True,
+            "payu_url": settings.PAYU_BASE_URL,
+            "params": payu_payload,
+            "order_id": order.id,
+        }, status=status.HTTP_201_CREATED)
+
     def post(self, request):
         payment_method = None
-        initiation_lock_key = None
+        short_lock_key = None
+        got_lock = False
         try:
             data = request.data
             source = request.query_params.get('source')
-            
+
             # Auth check: cart checkout requires login, buynow allows guest
             if source == 'cart' and not request.user.is_authenticated:
                 return error_response('Login required for cart checkout', status_code=status.HTTP_401_UNAUTHORIZED)
-            
+
             user = request.user
             payment_method = data.get('paymentMethod', 'COD')
 
-            if payment_method == 'ONLINE':
-                amount_data = data.get('amount', {}) or {}
-                lock_fingerprint = "|".join([
-                    str(source or ''),
-                    str(getattr(user, 'id', '') if user.is_authenticated else 'guest'),
-                    str(data.get('email', '')).strip().lower(),
-                    str(data.get('phone', '')).strip(),
-                    str(amount_data.get('total', '')),
-                ])
-                initiation_lock_key = f"payu:initiate:{sha256(lock_fingerprint.encode('utf-8')).hexdigest()}"
+            if payment_method != 'ONLINE':
+                # COD / offline: unchanged behaviour (no PaymentSession).
+                order, error = self._create_order(user, data, payment_method, source)
+                if error:
+                    return error_response(error, status_code=status.HTTP_400_BAD_REQUEST)
+                self._finalize_order_number(user, order, data)
+                return self._payment_response(user, order)
 
-                # Stop accidental double-clicks/retries from creating multiple PayU requests.
-                if not cache.add(initiation_lock_key, '1', timeout=65):
-                    return Response({
-                        "success": False,
-                        "message": "Payment request already started. Please wait 60 seconds and try again."
-                    }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+            # ---- ONLINE payment: idempotent PaymentSession flow ----
+            amount_data = data.get('amount', {}) or {}
+            lock_fingerprint = "|".join([
+                str(source or ''),
+                str(getattr(user, 'id', '') if user.is_authenticated else 'guest'),
+                str(data.get('email', '')).strip().lower(),
+                str(data.get('phone', '')).strip(),
+                str(amount_data.get('total', '')),
+            ])
+            fp = sha256(lock_fingerprint.encode('utf-8')).hexdigest()
+            short_lock_key = f"payu:initiate:{fp}"
 
-            # First create order
+            # Brief lock only to serialize simultaneous double-clicks before a
+            # PaymentSession row exists (not a 60s user-facing block).
+            got_lock = cache.add(short_lock_key, '1', timeout=10)
+
+            with db_transaction.atomic():
+                existing = (PaymentSession.objects
+                            .select_for_update()
+                            .filter(cart_fingerprint=fp,
+                                    status__in=PaymentSession.REUSABLE_STATUSES)
+                            .order_by('-created_at')
+                            .first())
+                if existing:
+                    if existing.is_expired():
+                        existing.mark('EXPIRED')
+                    elif not existing.order_id:
+                        existing.mark('ABANDONED')
+                    elif existing.order.payment_status == 'Paid':
+                        existing.mark('SUCCESS')
+                    elif existing.order.payment_status != 'Pending':
+                        existing.mark('ABANDONED')
+                    else:
+                        # Reuse: same order -> same txnid -> identical PayU
+                        # request, so PayU sees no new transaction.
+                        existing.retry_count += 1
+                        existing.status = 'PAYMENT_PENDING'
+                        existing.save(update_fields=['retry_count', 'status', 'updated_at'])
+                        order = existing.order
+                        logger.info(
+                            "payu.reuse txnid=%s order_id=%s retry_count=%s",
+                            order.transaction_id, order.id, existing.retry_count,
+                        )
+                        resp = self._payment_response(user, order)
+                        if got_lock:
+                            cache.delete(short_lock_key)
+                        return resp
+
+            # No reusable session -> create a fresh order + PaymentSession.
+            if not got_lock:
+                # A concurrent request holds the brief lock and is creating the
+                # session; ask the client to retry instead of duplicating.
+                logger.warning("payu.initiate_lock_rejected fp=%s", fp[:12])
+                return Response({
+                    "success": False,
+                    "message": "Payment is being initialized. Please wait a moment and try again."
+                }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
             order, error = self._create_order(user, data, payment_method, source)
             if error:
+                cache.delete(short_lock_key)
                 return error_response(error, status_code=status.HTTP_400_BAD_REQUEST)
-            
-            # Generate order number (only if user authenticated, else use guest format)
-            if user.is_authenticated:
-                order_number = self._create_order_number(user, order.id)
-                order.order_number = order_number
-                order.save()
-                self._save_address(user, data)
-            else:
-                # Guest checkout: minimal order tracking
-                order.order_number = f"GUEST{order.id}"
-                order.save()
+            self._finalize_order_number(user, order, data)
 
-            # For online payment, create payment request
-            key = settings.PAYU_MERCHANT_KEY
-            salt = settings.PAYU_MERCHANT_SALT
-            payu_base_url = settings.PAYU_BASE_URL
-            
-            # Create hash for payment
-            hash_str = f"{key}|{order.transaction_id}|{order.final_price}|Order Payment|{order.name}|{order.email}|||||||||||{salt}"
-            hashh = hashlib.sha512(hash_str.encode('utf-8')).hexdigest().lower()
-            
-            # Create transaction record
-            transaction = Transaction.objects.create(
-                user=user,
-                name=order.name,
-                amount=str(order.final_price),
-                transaction_id=order.transaction_id,
-                phone_number=order.phone_number,
-                token=hashh,
-                order=order
+            checkout_session = None
+            if source == 'buynow':
+                token = data.get('session_token')
+                if token:
+                    checkout_session = CheckoutSession.objects.filter(session_token=token).first()
+
+            PaymentSession.objects.create(
+                user=user if user.is_authenticated else None,
+                source=source,
+                cart_fingerprint=fp,
+                checkout_session=checkout_session,
+                order=order,
+                txnid=order.transaction_id,
+                amount=order.final_price,
+                status='PAYMENT_PENDING',
             )
-            
-            # Prepare payment payload
-            payu_payload = {
-                "key": key,
-                "txnid": order.transaction_id,
-                "amount": str(order.final_price),
-                "productinfo": "Order Payment",
-                "firstname": order.name,
-                "email": order.email,
-                "phone": order.phone_number,
-                "surl": f"{settings.WEB_URL}{settings.PAYU_SUCCESS_URL}?txnid={order.transaction_id}&hash={hashh}&status=success",
-                "furl": f"{settings.WEB_URL}{settings.PAYU_FAILURE_URL}?status=failed",
-                "hash": hashh,
-                "service_provider": "payu_paisa"
-            }
-            
-            return Response({
-                "success": True,
-                "payu_url": payu_base_url,
-                "params": payu_payload,
-                "order_id": order.id
-            }, status=status.HTTP_201_CREATED)
+            logger.info(
+                "payu.initiate txnid=%s order_id=%s source=%s fp=%s amount=%s payment_method=%s",
+                order.transaction_id, order.id, source, fp[:12],
+                format(order.final_price, '.2f'), payment_method,
+            )
+            resp = self._payment_response(user, order)
+            cache.delete(short_lock_key)
+            return resp
 
         except Exception as e:
-            if payment_method == 'ONLINE' and initiation_lock_key:
-                cache.delete(initiation_lock_key)
+            if payment_method == 'ONLINE' and short_lock_key and got_lock:
+                cache.delete(short_lock_key)
             logger.exception("Error in PaymentOrderAPIView")
             return Response({"success":False, "message": "Something went wrong. Please try again later."}, status=status.HTTP_400_BAD_REQUEST)

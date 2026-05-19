@@ -1778,3 +1778,16 @@ class CheckoutSessionAdmin(admin.ModelAdmin):
     is_expired.boolean = True
 
 admin_site.register(CheckoutSession, CheckoutSessionAdmin)
+
+
+class PaymentSessionAdmin(admin.ModelAdmin):
+    list_display = ('txnid', 'status', 'source', 'user', 'amount', 'retry_count', 'created_at', 'expires_at', 'is_expired')
+    list_filter = ('status', 'source', 'created_at')
+    readonly_fields = ('created_at', 'updated_at')
+    search_fields = ('txnid', 'user__email', 'order__order_number')
+
+    def is_expired(self, obj):
+        return obj.is_expired()
+    is_expired.boolean = True
+
+admin_site.register(PaymentSession, PaymentSessionAdmin)

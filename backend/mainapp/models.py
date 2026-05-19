@@ -504,3 +504,62 @@ class CheckoutSession(models.Model):
     class Meta:
         verbose_name = "Checkout Session"
         verbose_name_plural = "Checkout Sessions"
+
+
+class PaymentSession(models.Model):
+    SOURCE_CHOICES = (
+        ('cart', 'cart'),
+        ('buynow', 'buynow'),
+    )
+    STATUS_CHOICES = (
+        ('INITIATED', 'INITIATED'),
+        ('PAYMENT_PENDING', 'PAYMENT_PENDING'),
+        ('SUCCESS', 'SUCCESS'),
+        ('FAILED', 'FAILED'),
+        ('EXPIRED', 'EXPIRED'),
+        ('ABANDONED', 'ABANDONED'),
+    )
+    REUSABLE_STATUSES = ('INITIATED', 'PAYMENT_PENDING')
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    source = models.CharField(max_length=12, choices=SOURCE_CHOICES)
+    cart_fingerprint = models.CharField(max_length=64, db_index=True)
+    checkout_session = models.ForeignKey(
+        CheckoutSession, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    order = models.ForeignKey(
+        Order, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='payment_sessions'
+    )
+    txnid = models.CharField(max_length=50, unique=True, db_index=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='INITIATED')
+    retry_count = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        verbose_name = "Payment Session"
+        verbose_name_plural = "Payment Sessions"
+        indexes = [
+            models.Index(fields=['cart_fingerprint', 'status']),
+        ]
+
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timezone.timedelta(minutes=15)
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    def is_reusable(self):
+        return self.status in self.REUSABLE_STATUSES and not self.is_expired()
+
+    def mark(self, status):
+        self.status = status
+        self.save(update_fields=['status', 'updated_at'])
+
+    def __str__(self):
+        return f"PaymentSession {self.txnid} - {self.status}"

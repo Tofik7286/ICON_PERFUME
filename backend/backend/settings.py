@@ -58,9 +58,14 @@ if not ALLOWED_HOSTS:
 # CSRF_COOKIE_SECURE = to_bool(os.environ.get('CSRF_COOKIE_SECURE', 'True'))
 
 
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+_is_production = DJANGO_ENV == 'production'
+
+SECURE_SSL_REDIRECT = False  # Nginx handles SSL termination, not Django
+SESSION_COOKIE_SECURE = _is_production
+CSRF_COOKIE_SECURE = _is_production
+SECURE_HSTS_SECONDS = 31536000 if _is_production else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _is_production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if _is_production else None
 WEB_URL = os.environ.get("WEB_URL")
 
 PAYU_MERCHANT_KEY = os.environ.get('PAYU_MERCHANT_KEY')
