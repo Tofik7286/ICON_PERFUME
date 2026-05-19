@@ -1073,7 +1073,7 @@ const Checkout = () => {
                     disabled={isSubmittingPayment}
                   >
                     {isSubmittingPayment
-                      ? "Processing..."
+                      ? "Payment processing… please wait before retrying"
                       : paymentMethodType === "ONLINE"
                       ? `Pay Now \u20B9${amount.total}`
                       : `Buy Now \u20B9${amount.total}`}
