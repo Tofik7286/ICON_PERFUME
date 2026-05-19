@@ -51,6 +51,7 @@ const Checkout = () => {
   const [promoApplied, setPromoApplied] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
+  const isSubmittingRef = useRef(false); // synchronous guard — prevents double-click race with useState
   const [country, setCountry] = useState("+91");
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [discount_type, setDiscount_type] = useState(null);
@@ -400,8 +401,7 @@ const Checkout = () => {
             type: "error",
           })
         );
-        dispatch(loader(false));
-        return;
+        return false;
       }
       // Mismatch guard: if even ₹1 difference, force session refresh
       if (Math.abs(Number(verifiedAmount.total) - Number(amount?.total)) >= 1) {
@@ -413,8 +413,7 @@ const Checkout = () => {
             type: "error",
           })
         );
-        dispatch(loader(false));
-        return;
+        return false;
       }
       // Use the verified amount from backend
       data.amt = verifiedAmount.total;
@@ -431,8 +430,7 @@ const Checkout = () => {
             type: "error",
           })
         );
-        dispatch(loader(false));
-        return;
+        return false;
       }
 
       if (!paymentData.params) {
@@ -443,8 +441,7 @@ const Checkout = () => {
             type: "error",
           })
         );
-        dispatch(loader(false));
-        return;
+        return false;
       }
 
       const form = document.createElement("form");
@@ -461,6 +458,7 @@ const Checkout = () => {
 
       document.body.appendChild(form);
       form.submit();
+      return true; // form dispatched to PayU — keep button disabled until page navigates
     } catch (error) {
       console.error("🔥 Error during payment request:", error);
       dispatch(
@@ -469,14 +467,16 @@ const Checkout = () => {
           type: "error",
         })
       );
-      dispatch(loader(false));
+      return false;
     }
   }
 
   const onSubmit = async (data) => {
-    if (isSubmittingPayment) {
-      return;
-    }
+    // Synchronous ref check — immune to React's async state batching on rapid clicks
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+
+    let paymentFormSubmitted = false;
 
     try {
       setIsSubmittingPayment(true);
@@ -505,9 +505,9 @@ const Checkout = () => {
 
       // ONLINE payment -> redirect to PayU hosted page
       if (data.paymentMethod === "ONLINE") {
-        await handlePayment(checkoutData);
-        // If handlePayment succeeded it will have submitted the form and navigated away.
-        // Execution probably won't reach here because page navigation happens.
+        paymentFormSubmitted = await handlePayment(checkoutData);
+        // If form was submitted to PayU, keep button disabled until page navigates away.
+        // If it failed (false), finally will re-enable it so the user can retry.
         return;
       }
       // COD (or offline) flow: verify total before placing order
@@ -561,7 +561,13 @@ const Checkout = () => {
         })
       );
     } finally {
-      setIsSubmittingPayment(false);
+      // Only re-enable the button if the payment form was NOT sent to PayU.
+      // If it was sent, keep disabled — the page is navigating away anyway,
+      // and re-enabling creates the window for a second form.submit() call.
+      if (!paymentFormSubmitted) {
+        isSubmittingRef.current = false;
+        setIsSubmittingPayment(false);
+      }
       dispatch(loader(false));
     }
   };
