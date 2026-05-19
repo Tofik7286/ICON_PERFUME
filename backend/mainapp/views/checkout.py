@@ -705,15 +705,19 @@ class PaymentOrderAPIView(APIView):
                     elif existing.order.payment_status != 'Pending':
                         existing.mark('ABANDONED')
                     else:
-                        # Reuse: same order -> same txnid -> identical PayU
-                        # request, so PayU sees no new transaction.
+                        # Retry: generate a fresh txnid so PayU doesn't reject
+                        # the duplicate within its 60-second window.
+                        new_txnid = self._create_transaction_id()
+                        order = existing.order
+                        order.transaction_id = new_txnid
+                        order.save(update_fields=['transaction_id'])
+                        existing.txnid = new_txnid
                         existing.retry_count += 1
                         existing.status = 'PAYMENT_PENDING'
-                        existing.save(update_fields=['retry_count', 'status', 'updated_at'])
-                        order = existing.order
+                        existing.save(update_fields=['txnid', 'retry_count', 'status', 'updated_at'])
                         logger.info(
-                            "payu.reuse txnid=%s order_id=%s retry_count=%s",
-                            order.transaction_id, order.id, existing.retry_count,
+                            "payu.retry new_txnid=%s order_id=%s retry_count=%s",
+                            new_txnid, order.id, existing.retry_count,
                         )
                         resp = self._payment_response(user, order)
                         if got_lock:
