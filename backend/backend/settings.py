@@ -333,12 +333,14 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters':{
         'verbose':{
-            'format':'{message}',
-            'style':'{',
+            'format': '{asctime} {levelname} [{name}] {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         },
         'simple':{
-            'format':'{levelname} {message}',
-            'style':'{',
+            'format': '{asctime} {levelname} {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         }
     },
     'handlers': {
@@ -375,7 +377,12 @@ LOGGING = {
             'handlers': ['error_handler'],
             'level':'DEBUG',
             'propagate': False
-        }
+        },
+        'mainapp': {
+            'handlers': ['file', 'error_handler'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
 

@@ -61,28 +61,58 @@ class VerifyPaymentAPIView(APIView):
         }
 
         url = "https://info.payu.in/merchant/postservice"
-        resp = requests.post(url, data=payload)
-        return resp.json()
+        resp = None
+        try:
+            resp = requests.post(url, data=payload, timeout=15)
+            resp.raise_for_status()
+            result = resp.json()
+            logger.info(
+                "payu.verify_api_response txnid=%s http_status=%s gateway_status=%s",
+                payu_txnid, resp.status_code, result.get('status'),
+            )
+            return result
+        except requests.Timeout:
+            logger.error("payu.verify_api_timeout txnid=%s url=%s", payu_txnid, url)
+            raise
+        except requests.ConnectionError as e:
+            logger.error("payu.verify_api_connection_error txnid=%s error=%s", payu_txnid, str(e))
+            raise
+        except ValueError:
+            logger.error(
+                "payu.verify_api_invalid_json txnid=%s http_status=%s",
+                payu_txnid, resp.status_code if resp is not None else 'N/A',
+            )
+            raise
     
     def post(self, request):
         try:
             data = request.data
             payu_txnid = data.get("txnid")
-            logger.info("payu.callback_verify txnid=%s", payu_txnid)
+            logger.info(
+                "payu.verify_start txnid=%s source=%s user_id=%s",
+                payu_txnid,
+                request.query_params.get('source'),
+                request.user.id if request.user.is_authenticated else 'guest',
+            )
 
             # Verify payment
             response = self._verify_payment(data)
             gateway_status = response.get('status')
             logger.info(
-                "payu.verify_result txnid=%s gateway_status=%s",
+                "payu.verify_gateway_result txnid=%s gateway_status=%s",
                 payu_txnid, gateway_status,
             )
             if gateway_status != 1:
+                logger.warning(
+                    "payu.verify_gateway_failed txnid=%s gateway_response=%s",
+                    payu_txnid, response,
+                )
                 return Response({"success": False, "message": "Payment failed ❌"}, status=400)
             
             # Find transaction and order
             transaction = Transaction.objects.filter(transaction_id=payu_txnid).first()
             if not transaction:
+                logger.error("payu.verify_txn_not_found txnid=%s", payu_txnid)
                 return Response({
                     'success': False,
                     'message': 'Transaction not found',
@@ -91,6 +121,10 @@ class VerifyPaymentAPIView(APIView):
             
             # Fast-path idempotency for double callbacks.
             if transaction.order.payment_status == "Paid":
+                logger.info(
+                    "payu.verify_already_paid txnid=%s order_id=%s",
+                    payu_txnid, transaction.order.id,
+                )
                 return Response({
                     'success': False,
                     'message': 'Order already processed',
@@ -167,6 +201,10 @@ class VerifyPaymentAPIView(APIView):
             # Generate invoice (outside the lock; external/slow work).
             generate_invoice(order.email, order.order_number)
 
+            logger.info(
+                "payu.verify_success txnid=%s order_id=%s order_number=%s amount=%s",
+                payu_txnid, order.id, order.order_number, order.final_price,
+            )
             return Response({
                 'success': True,
                 'message': 'Payment verified successfully',
@@ -614,6 +652,10 @@ class PaymentOrderAPIView(APIView):
         amount_str = format(order.final_price, ".2f")
         hash_str = f"{key}|{order.transaction_id}|{amount_str}|Order Payment|{order.name}|{order.email}|||||||||||{salt}"
         hashh = hashlib.sha512(hash_str.encode('utf-8')).hexdigest().lower()
+        logger.info(
+            "payu.hash_generated txnid=%s amount=%s productinfo=Order Payment",
+            order.transaction_id, amount_str,
+        )
         payu_payload = {
             "key": key,
             "txnid": order.transaction_id,
@@ -656,6 +698,12 @@ class PaymentOrderAPIView(APIView):
         try:
             data = request.data
             source = request.query_params.get('source')
+            logger.info(
+                "payu.initiate_start source=%s payment_method=%s user_id=%s",
+                source,
+                data.get('paymentMethod', 'COD'),
+                request.user.id if request.user.is_authenticated else 'guest',
+            )
 
             # Auth check: cart checkout requires login, buynow allows guest
             if source == 'cart' and not request.user.is_authenticated:
@@ -670,6 +718,10 @@ class PaymentOrderAPIView(APIView):
                 if error:
                     return error_response(error, status_code=status.HTTP_400_BAD_REQUEST)
                 self._finalize_order_number(user, order, data)
+                logger.info(
+                    "payu.cod_order_created txnid=%s order_id=%s amount=%s",
+                    order.transaction_id, order.id, order.final_price,
+                )
                 return self._payment_response(user, order)
 
             # ---- ONLINE payment: idempotent PaymentSession flow ----

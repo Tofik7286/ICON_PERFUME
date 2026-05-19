@@ -15,10 +15,19 @@ export async function POST(req) {
     const hash = formData.get("hash") || "";
     const payuStatus = (formData.get("status") || "").toString().toLowerCase();
     const mihpayid = formData.get("mihpayid") || "";
+    const mode = formData.get("mode") || "";
+    const amount = formData.get("amount") || "";
 
     const mappedStatus = payuStatus === "success" ? "success" : "failed";
 
-    console.log("payu.callback_recv", { txnid, status: payuStatus, mihpayid });
+    console.log("payu.callback_recv", {
+      txnid,
+      status: payuStatus,
+      mihpayid,
+      mode,
+      amount,
+      hash_present: !!hash,
+    });
 
     const target = `${base}/payment-process/?txnid=${encodeURIComponent(
       txnid
