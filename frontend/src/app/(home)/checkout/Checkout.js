@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "@/app/(home)/styles/checkout.module.css";
 import Cart from "@/app/(home)/styles/cart.module.css";
 import Image from "next/image";
