@@ -5,7 +5,7 @@ export async function middleware(request) {
   const token = request.cookies.get("token")?.value;
 
   // Fix for PayU redirects
-  if (pathname === "/payment-process") {
+  if (pathname.startsWith("/payment-process")) {
     const reqHeaders = new Headers(request.headers);
     reqHeaders.set("x-forwarded-host", process.env.DOMAIN);
     return NextResponse.next({ request: { headers: reqHeaders } });
@@ -26,7 +26,7 @@ export async function middleware(request) {
         return NextResponse.redirect(new URL("/", request.url));
       }
     }
-    if (pathname.startsWith("/payment")) {
+    if (pathname.startsWith("/payment") && !pathname.startsWith("/payment-process")) {
       let payment_token = request.cookies.get("payment_token");
       if (
         !payment_token ||
@@ -50,5 +50,6 @@ export const config = {
     "/checkout/:path*",
     "/payment/:path*",
     "/payment-process",
+    "/payment-process/:path*",
   ],
 };

@@ -5,8 +5,8 @@ import logging
 import uuid
 import string
 import random
+import requests
 from hashlib import sha256
-
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
@@ -60,7 +60,7 @@ class VerifyPaymentAPIView(APIView):
             "hash": hashh
         }
 
-        url = "https://info.payu.in/merchant/postservice?form=2"
+        url = "https://info.payu.in/merchant/postservice"
         resp = requests.post(url, data=payload)
         return resp.json()
     
@@ -622,7 +622,7 @@ class PaymentOrderAPIView(APIView):
             "firstname": order.name,
             "email": order.email,
             "phone": order.phone_number,
-            "surl": f"{settings.WEB_URL}{settings.PAYU_SUCCESS_URL}?txnid={order.transaction_id}&hash={hashh}&status=success",
+            "surl": f"{settings.WEB_URL}{settings.PAYU_SUCCESS_URL}?txnid={order.transaction_id}&status=success",
             "furl": f"{settings.WEB_URL}{settings.PAYU_FAILURE_URL}?status=failed",
             "hash": hashh,
         }
