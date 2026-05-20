@@ -207,7 +207,7 @@ const Navbar1 = ({ categories = [] }) => {
                 <Image src="/icon_images/logo.png"  className='img-fluid' alt="Icon perfumes Logo" width={80} height={60} />
               </Link>
               {pathname === "/checkout/" || pathname === "/payment/" ? null :
-              <div className={`${styles.icon} md:hidden`} onClick={() => { setSearchPopup(true) }}>
+              <div className={`${styles.icon} md:!hidden`} onClick={() => { setSearchPopup(true) }}>
                 <IoSearchOutline />
               </div>}
             </div>
@@ -246,7 +246,7 @@ const Navbar1 = ({ categories = [] }) => {
               </ul>}
 
             {pathname === "/checkout/" || pathname === "/payment/" ? null : <div className="d-flex align-items-center">
-              <div className={`${styles.icon} hidden md:!flex`} onClick={() => { setSearchPopup(true) }}>
+              <div className={`${styles.icon} !hidden md:!flex`} onClick={() => { setSearchPopup(true) }}>
                 <IoSearchOutline />
               </div>
               <Link onClick={() => setSearchPopup(false)} href={"/wishlist"} className={`${styles.icon} ${styles.wishlist} ${styles.badge}`} total={wishList ? wishList.length : "0"}>
