@@ -43,4 +43,8 @@ urlpatterns = [
     # path('create-checkout-session/',StripeCheckoutview.as_view(),name='create_checkout_session'),
     re_path(r'^invoices/(?P<path>.*)$',serve_invoices, name='invoices'),
     path('',include('accounts.urls')),
+    path('products/admin/', ProductListCreateView.as_view(), name='product-list-create'),
+    path('products/admin/<slug:slug>/', ProductRetrieveUpdateDestroyView.as_view(), name='product-detail'),
+    path('products/admin/<slug:slug>/variants/<int:variant_id>/', ProductVariantUpdateView.as_view(), name='variant-update'),
+    path('categories/tree/', CategoryListView.as_view(), name='category-tree'),
 ]  + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

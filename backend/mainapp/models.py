@@ -84,6 +84,7 @@ class Product(models.Model):
     best_seller = models.BooleanField(default=False)
     recommended = models.BooleanField(default=False)
     is_combo = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     height = models.DecimalField(max_digits=10,null=True,blank=True,decimal_places=2)
     breadth = models.DecimalField(max_digits=10,null=True,blank=True,decimal_places=2)
     width = models.DecimalField(max_digits=10,null=True,blank=True,decimal_places=2)
@@ -157,11 +158,14 @@ class ProductVariant(models.Model):
                 counter += 1
             self.slug = slug
 
-        # Generate SKU if missing
+        # Generate SKU if missing — requires a PK, so INSERT first if new object.
+        # We strip force_insert from the final save so Django does an UPDATE on
+        # the already-inserted row rather than attempting a duplicate INSERT.
         if not self.sku:
             if not self.pk:
                 super().save(*args, **kwargs)
             self.sku = f"{self.product.title[:2].upper()}-{self.pk:03}"
+            kwargs.pop('force_insert', None)
 
         super().save(*args, **kwargs)
 

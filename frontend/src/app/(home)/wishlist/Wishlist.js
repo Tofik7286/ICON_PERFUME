@@ -31,12 +31,12 @@ const Wishlist = () => {
         const mainCategory = product.category.find(cat => cat.level === 0);
         const subCategory = product.category.find(cat => cat.level === 1);
 
+        if (!mainCategory) return `/${product.slug}`;
+
         if (subCategory) {
-            // We're on subcategory page → include both
             return `/${mainCategory.name.toLowerCase().replace(/\s+/g, '-')}/${subCategory.name.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`;
         }
 
-        // Otherwise just category/product-slug
         return `/${mainCategory.name.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`;
     }
     return (

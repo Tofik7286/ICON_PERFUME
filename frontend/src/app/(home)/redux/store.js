@@ -11,6 +11,7 @@ import productsReducer from './productSlice'
 import confirmReducer from './confirmSlice'
 import cookieReducer from './cookieSlice'
 import redirectReducer from './redirectSlice'
+import adminProductsReducer from './slices/adminProductsSlice'
 
 const store = configureStore({
   reducer: {
@@ -24,7 +25,8 @@ const store = configureStore({
     products: productsReducer,
     confirm: confirmReducer,
     cookie: cookieReducer,
-    redirect: redirectReducer
+    redirect: redirectReducer,
+    adminProducts: adminProductsReducer,
   },
 });
 

@@ -182,10 +182,12 @@ async function fetchCategoryProducts(category_name, searchParams) {
 
         return { products, totalPages };
     } catch (error) {
-        console.error("Error fetching data:", error);
+        // 400 is expected when the slug is a product (not a category) — not a real error
+        if (error?.response?.status !== 400) {
+            console.error("Error fetching category products:", error);
+        }
         const products = []
         return { products, totalPages: 1 }
-        // return error
     }
 }
 async function fetchSubCategoryProducts(category_name, sub_category_name, searchParams) {
@@ -345,11 +347,18 @@ const page = async ({ params, searchParams }) => {
 
         if (products.length > 0) {
             return (
-
                 <Suspense fallback={<ProductGridSkeleton count={8} />}>
                     <Shop products={products} totalPages={totalPages} categories={categories} category_name={category} />
                 </Suspense>
             )
+        }
+
+        // Not a category — try treating the single slug as a product slug
+        // (happens when a product has no category assigned)
+        const data = await fetchProduct(category);
+        const reviews = await getProductReviews(category, resolvedSearchParams);
+        if (data) {
+            return <Detail review={reviews} detailData={data} slug={category} />;
         }
     }
     if (slug.length === 2) {

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Breadcrumb from '../components/BreadCrumb';
 import styles from '@/app/(home)/styles/Profile.module.css'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { deleteUser, setUser } from '../redux/userSlice';
 import Cookies from 'universal-cookie';
 import { addToast } from '../redux/toastSlice';
@@ -29,6 +29,7 @@ export default function ProfileLayout({ children }) {
 
   const pathname = usePathname();
   const dispatch = useDispatch();
+  const userState = useSelector((state) => state.user);
 
   const url = process.env.NEXT_PUBLIC_API_URL
   const cookies = new Cookies();
@@ -125,6 +126,13 @@ export default function ProfileLayout({ children }) {
                 <Link href="/profile/orders" className={pathname === '/profile/orders' ? styles.active : ''}>
                   <HiOutlineShoppingBag />  My Orders</Link>
               </li>
+              {userState.user?.is_staff && (
+                <li className="mb-1 me-1">
+                  <Link href="/admin/products" className={pathname.startsWith('/admin/products') ? styles.active : ''}>
+                    Products
+                  </Link>
+                </li>
+              )}
               <li className="mb-1 me-1">
                 <a>
                   <BiLogOutCircle />
