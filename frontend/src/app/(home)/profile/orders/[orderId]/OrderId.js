@@ -24,20 +24,24 @@ const OrderId = ({data}) => {
 
     const statuses = ["confirmed", "shipped", "out_for_delivery", "delivered"];
     const progress = statuses.reduce((acc, status, index) => {
-        const currentStatusIndex = statuses.indexOf(
-            data?.order.order_status
-                .toLowerCase() // Normalize to lowercase
-                .replace(/\s+/g, '_') // Replace spaces with underscores
-        );
+        const orderStatus = data?.order?.order_status;
+        const currentStatusIndex = orderStatus
+            ? statuses.indexOf(
+                orderStatus
+                    .toLowerCase() // Normalize to lowercase
+                    .replace(/\s+/g, '_') // Replace spaces with underscores
+              )
+            : -1;
         acc[status] = index <= currentStatusIndex;
         return acc;
     }, {});
 
     function getProductURL(product) {
-        const mainCategory = product.category.find(cat => cat.level === 0);
-        const subCategory = product.category.find(cat => cat.level === 1);
+        if (!product) return '#';
+        const mainCategory = product?.category?.find?.(cat => cat.level === 0);
+        const subCategory = product?.category?.find?.(cat => cat.level === 1);
 
-        if (!mainCategory) return `/${product.slug}`;
+        if (!mainCategory) return `/${product.slug || ''}`;
 
         if (subCategory) {
             return `/${mainCategory.name.toLowerCase().replace(/\s+/g, '-')}/${subCategory.name.toLowerCase().replace(/\s+/g, '-')}/${product.slug}`;
@@ -52,28 +56,28 @@ const OrderId = ({data}) => {
             <div className={styles.order_detail_container}>
                 <div className={styles.order_card_detail}>
                     <div className={styles.order_header}>
-                        <h4 style={{ fontWeight: "500" }}>Order ID: {data?.order.order_number}</h4>
+                        <h4 style={{ fontWeight: "500" }}>Order ID: {data?.order?.order_number}</h4>
                     </div>
 
-                    {data && data.order_items.length > 0 ? data.order_items.map((item, index) => {
+                    {data?.order?.items && data.order.items.length > 0 ? data.order.items.map((item, index) => {
                         return <Link href={getProductURL(item?.variant?.product)} key={index} className={styles.order_body}>
                             <Image
-                                src={item?.variant?.images[0]?.image ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${item?.variant?.images[0]?.image}`:""}
-                                alt={item.variant?.product.title}
+                                src={item?.variant?.images?.[0]?.image ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${item?.variant?.images[0]?.image}` : ""}
+                                alt={item?.variant?.product?.title || "Product image"}
                                 width={500}
                                 height={500}    
                                 style={{ width: "7em", height: "7em", borderRadius: ".5em" }}
                             />
                             <div>
-                                <h4>{item.variant?.product.title}</h4>
-                                <p><b>Price :</b> &#8377; {item.variant?.discounted_price}</p>
-                                {item.variant.color && <p><b>Color :</b> {item.variant?.color.name}</p>}
-                                <p><b>Quantity :</b> {item.quantity}</p>
+                                <h4>{item?.variant?.product?.title}</h4>
+                                <p><b>Price :</b> &#8377; {item?.variant?.discounted_price}</p>
+                                {item?.variant?.color && <p><b>Color :</b> {item.variant?.color?.name}</p>}
+                                <p><b>Quantity :</b> {item?.quantity}</p>
                             </div>
                         </Link>
                     }) : null}
 
-                    {!data.order_items[0].variant.product.is_giftcard && <div className={styles.order_progress}>
+                    {!data?.order?.items?.[0]?.variant?.product?.is_giftcard && <div className={styles.order_progress}>
                         <div className={progress.confirmed ? styles.progress_step_active : styles.progress_step}>
                             <span ><IoBagCheck style={{ height: 20, width: 20 }} /></span>
                             <p>Placed</p>
@@ -183,12 +187,11 @@ const OrderId = ({data}) => {
     } else {
         return (
             <div className="d-flex align-items-center justify-content-center flex-col" style={{ height: "100vh" }}>
-                {error ? null : <div className="loader-circle">
+                <div className="loader-circle">
                     <span className="loader"></span>
-                </div>}
-                {error && <h6 className="mt-2">!{error}</h6>}
+                </div>
             </div>
-        )
+        );
     }
 
 };

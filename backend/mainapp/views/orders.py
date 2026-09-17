@@ -61,10 +61,11 @@ class UserOrders(APIView):
 # DRY-04: Fixed — @api_view MUST be outermost decorator
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def getOrder(request, id):
+def getOrder(request, order_id=None, id=None):
+    pk = order_id or id
     try:
         user = request.user
-        order = Order.objects.prefetch_related('items__variant__product__category', 'items__variant__product__series', 'items__variant__images', 'items__variant__notes').get(id=id, user=user)
+        order = Order.objects.prefetch_related('items__variant__product__category', 'items__variant__product__series', 'items__variant__images', 'items__variant__notes').get(id=pk, user=user)
         serializer = OrderSerializer(order)
         return Response({'success': True, 'order': serializer.data}, status=status.HTTP_200_OK)
     except Order.DoesNotExist:
@@ -72,7 +73,6 @@ def getOrder(request, id):
     except Exception as e:
         logger.exception("Error in getOrder")
         return error_response('Something went wrong. Please try again later.', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 # DRY-04: Fixed — @api_view MUST be outermost decorator
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

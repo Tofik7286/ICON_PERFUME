@@ -5,7 +5,7 @@ import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 export async function generateMetadata({ params }) {
-  const orderId = params.orderId;
+  const { orderId } = await params;
   // Fetch the home data for metadata purposes
 
   return {
@@ -33,11 +33,11 @@ async function getOrderDetails(id){
   }
 }
 const page = async({params}) => {
-  const id = params.orderId;
-  const data = await getOrderDetails(id)
+  const { orderId } = await params;
+  const data = await getOrderDetails(orderId)
   if(data){
     return (
-      <OrderId data={data} id={id} />
+      <OrderId data={data} id={orderId} />
     )
   } else {
     notFound();
