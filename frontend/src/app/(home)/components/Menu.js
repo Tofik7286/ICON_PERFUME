@@ -12,8 +12,27 @@ import { BsShopWindow } from "react-icons/bs";
 import { RiContactsBook3Line } from "react-icons/ri";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { FiChevronDown } from "react-icons/fi";
-import { GiSquareBottle } from "react-icons/gi";
-import Image from 'next/image';
+import { GiSquareBottle, GiPerfumeBottle, GiLipstick } from "react-icons/gi";
+import { FaGift } from "react-icons/fa";
+
+// Map a category name (case-insensitive, trimmed) to its icon.
+// Unknown/new categories fall back to GiSquareBottle so nothing ever renders blank.
+const getCategoryIcon = (name, size = 18) => {
+    const key = (name || "").trim().toLowerCase();
+    switch (key) {
+        case "attar":
+            return <GiPerfumeBottle size={size} />;
+        case "gift sets":
+        case "gift set":
+        case "gift pack":
+            return <FaGift size={size} />;
+        case "limestick":
+        case "lime stick":
+            return <GiLipstick size={size} />;
+        default:
+            return <GiSquareBottle size={size} />;
+    }
+};
 
 const Menu = ({ menu, setMenu, categoryTree = [] }) => {
 
@@ -47,7 +66,7 @@ const Menu = ({ menu, setMenu, categoryTree = [] }) => {
                             style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
                         >
                             <Link onClick={() => { setMenu(false) }} href={`/${slugify(cat.name)}`} className={`${styles.categoryLink} gap-2 items-center`}>
-                                {cat?.category_icon && <Image alt={`${cat.name}-Icon perfumes`} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${cat.category_icon}`} width={18} height={18}/> }
+                                {getCategoryIcon(cat.name, 18)}
                                 {cat.name}
                             </Link>
                             {cat.children.length > 0 && (
@@ -68,7 +87,7 @@ const Menu = ({ menu, setMenu, categoryTree = [] }) => {
                                             onClick={() => setMenu(false)}
                                             className='!text-sm gap-2 items-center w-full'
                                         >
-                                            {sub.category_icon && <Image alt={`${sub.name}-Icon Perfumes`} src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${sub.category_icon}`} width={15} height={15} />}
+                                            {getCategoryIcon(sub.name, 15)}
                                             {sub.name}
                                         </Link>
                                     </li>
